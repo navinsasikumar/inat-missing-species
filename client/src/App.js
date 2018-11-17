@@ -1,5 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { Component } from 'react';
+import InfiniteScroll from 'react-infinite-scroller';
 import './compiled/App.css';
 
 class TaxonImageLarge extends Component {
@@ -107,24 +108,60 @@ class Display extends Component {
     return (
       <React.Fragment>
         <StatusBar results={simpleData} />
-        <ResultsDisplay results={simpleData} count={resultCount} dispCount={dispCount}/>
+        <ResultsDisplay results={simpleData} count={resultCount} dispCount={dispCount} key={simpleData.length}/>
       </React.Fragment>
     );
   }
 }
 
 class ResultsDisplay extends Component {
-  render() {
-    let dispCount = this.props.dispCount || 25;
-    let simpleData = this.props.results;
-    let smallResults = simpleData.slice(0, dispCount);
-    let resultsDisp = this.props.count > 0 ? smallResults : <div className='col'>Loading ...</div>;
+  constructor(props) {
+    super(props);
+    this.loadItems = this.loadItems.bind(this);
+    this.state = {
+      results: [],
+      hasMore: true
+    };
+  }
 
-    return (
-      <div className="container">
-        <div className="row grid">{resultsDisp}</div>
-      </div>
-    );
+  loadItems(page) {
+    console.log('Loading items: ' + page);
+    let dispCount = this.props.dispCount || 25;
+    let smallResults = this.props.results.slice(0, page * dispCount || dispCount);
+    console.log('smallResults');
+    console.log(smallResults);
+    let hasMore = this.props.results.length > page * dispCount;
+    console.log('Has more: ' + hasMore);
+    let resultsDisp = this.props.count > 0 ? smallResults : <div className='col'>Loading ...</div>;
+    this.setState({ results: resultsDisp, hasMore: hasMore });
+    return resultsDisp;
+  }
+
+  render() {
+    const loader = <div key={this.props.results.length} className="loader">Loading ...</div>;
+    //let resultsDisp = this.loadItems(1);
+    let resultsDisp = this.state.results;
+    console.log('Rendering');
+
+    if (this.props.results.length > 0) {
+      return (
+        <InfiniteScroll
+                  pageStart={0}
+                  loadMore={this.loadItems}
+                  hasMore={this.state.hasMore}
+                  loader={loader}>
+          <div className="container">
+            <div className="row grid">{this.state.results}</div>
+          </div>
+        </InfiniteScroll>
+      );
+    } else {
+      return (
+        <div className="container">
+          <div className="row grid"><div className="col">Loading ... </div></div>
+        </div>
+      )
+    }
   }
 
 }
