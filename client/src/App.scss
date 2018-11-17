@@ -1,0 +1,96 @@
+.App {
+  text-align: center;
+  background-color: #eee;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 70px;
+  padding: 20px;
+  color: white;
+}
+
+.App-title {
+  font-size: 1.5em;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+img {
+  margin: 0 0 10px 0;
+}
+
+.App-ol {
+  text-align: left;
+}
+
+.Species-name {
+  text-transform: capitalize;
+}
+
+.taxonContainer {
+  float: left;
+}
+
+.crop {
+  height: 210px;
+  width: 210px;
+  overflow: hidden;
+}
+
+.crop img {
+  height: 210px;
+  width: 210px;
+  object-fit: cover;
+}
+
+.crop-center {
+  height: 300px;
+  width: 300px;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.crop-center img {
+  height: 300px;
+  width: 300px;
+  object-fit: cover;
+}
+
+.taxon-text {
+  font-size: 14px;
+  width: 210px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.taxon-square {
+  background-color: #fff;
+  margin: 5px;
+}
+
+.white-bg {
+  background-color: #fff;
+}
+
+.dark-grey-bg {
+  background-color: #222;
+  color: #eee;
+}
+
+.Iconic-taxa-name {
+  text-transform: capitalize;
+}
