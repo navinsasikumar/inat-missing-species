@@ -36,12 +36,9 @@ img {
   text-align: left;
 }
 
-.Species-name {
-  text-transform: capitalize;
-}
-
 .taxonContainer {
   float: left;
+  font: 14px/17px;
 }
 
 .crop {
@@ -75,11 +72,51 @@ img {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: left;
 }
 
 .taxon-square {
   background-color: #fff;
   margin: 5px;
+  position: relative;
+}
+
+.taxon-info {
+  text-align: left;
+  position: absolute;
+  bottom: 64px;
+  background-color: rgba(0,0,0,0.3);
+  color: white;
+  padding: 5px 9px;
+  width: 100%;
+}
+
+.taxon-info a {
+  color: white;
+}
+
+.taxon-names {
+  padding: 10px 9px;
+}
+
+.taxon-names a {
+  color: black;
+  text-decoration: none;
+}
+
+.common-name {
+  text-transform: capitalize;
+  font-weight: bold;
+}
+
+.latin-name {
+  font-style: italic;
+  color: #333;
+}
+
+.copyright-info {
+  position: relative;
+  float: right;
 }
 
 .white-bg {

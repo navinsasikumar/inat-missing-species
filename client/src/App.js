@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { Component } from 'react';
 import InfiniteScroll from 'react-infinite-scroller';
+import ReactTooltip from 'react-tooltip'
 import './compiled/App.css';
 
 class TaxonImageLarge extends Component {
@@ -28,9 +29,25 @@ class TaxonText extends Component {
     return (
       <React.Fragment>
         <div className="taxon-text">
-          <span className="Species-name">
-            {this.props.taxon.taxon.preferred_common_name || this.props.taxon.taxon.name}
-          </span> : {this.props.taxon.count}
+          <div className="taxon-info">
+            <a href={'https://www.inaturalist.org/observations?place_id=2983&subview=grid&view=&taxon_id=' + this.props.taxon.taxon.id + '&page='} target="_blank">
+              {this.props.taxon.count} Observations
+            </a>
+            <div className="copyright-info">
+              <div data-effect="solid" data-delay-show='500' data-delay-hide='500' data-tip={'Photo: ' + this.props.taxon.taxon.default_photo.attribution}>CC</div>
+              <ReactTooltip />
+            </div>
+          </div>
+          <div className="taxon-names">
+            <a href="">
+              <div className="common-name">
+                {this.props.taxon.taxon.preferred_common_name || this.props.taxon.taxon.name}
+              </div>
+              <div className="latin-name">
+                ({this.props.taxon.taxon.name})
+              </div>
+            </a>
+          </div>
         </div>
       </React.Fragment>
     )
@@ -54,8 +71,8 @@ class Taxon extends Component {
       <div className="taxon-square">
         <a href={'https://www.inaturalist.org/taxa/' + this.props.taxon.taxon.id} target="_blank">
           <TaxonImage img={this.props.taxon.taxon.default_photo} alt={this.props.taxon.taxon.name}/>
-          <TaxonText taxon={this.props.taxon} />
         </a>
+        <TaxonText taxon={this.props.taxon} />
       </div>
     );
   }
@@ -104,11 +121,12 @@ class Display extends Component {
     });
 
     let dispCount = 25;
+    let key = simpleData.length + '|' + this.props.filter.join('');
 
     return (
       <React.Fragment>
         <StatusBar results={simpleData} />
-        <ResultsDisplay results={simpleData} count={resultCount} dispCount={dispCount} key={simpleData.length}/>
+        <ResultsDisplay results={simpleData} count={resultCount} dispCount={dispCount} key={key}/>
       </React.Fragment>
     );
   }
@@ -128,10 +146,7 @@ class ResultsDisplay extends Component {
     console.log('Loading items: ' + page);
     let dispCount = this.props.dispCount || 25;
     let smallResults = this.props.results.slice(0, page * dispCount || dispCount);
-    console.log('smallResults');
-    console.log(smallResults);
     let hasMore = this.props.results.length > page * dispCount;
-    console.log('Has more: ' + hasMore);
     let resultsDisp = this.props.count > 0 ? smallResults : <div className='col'>Loading ...</div>;
     this.setState({ results: resultsDisp, hasMore: hasMore });
     return resultsDisp;
@@ -140,8 +155,6 @@ class ResultsDisplay extends Component {
   render() {
     const loader = <div key={this.props.results.length} className="loader">Loading ...</div>;
     //let resultsDisp = this.loadItems(1);
-    let resultsDisp = this.state.results;
-    console.log('Rendering');
 
     if (this.props.results.length > 0) {
       return (
