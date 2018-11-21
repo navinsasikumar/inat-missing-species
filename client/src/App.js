@@ -2,9 +2,24 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { Component } from 'react';
 import InfiniteScroll from 'react-infinite-scroller';
 import ReactTooltip from 'react-tooltip'
-import { Switch, Route } from 'react-router-dom'
-//import queryString from 'query-string'
+import { Switch, Route, Link } from 'react-router-dom'
+import queryString from 'query-string'
 import './compiled/App.css';
+
+class NavBar extends Component {
+  render() {
+    return (
+      <div className="navbar-links">
+        <span className="nav-item"><Link to='/'>Home</Link></span>
+        <span className="nav-item" data-effect="solid" data-tip="Species seen in Philly not yet observed during the CNC"><Link to='/?a_months=4,5&b_project_id=philadelphia-city-bioblitz-2018'>Philly</Link></span><ReactTooltip />
+        <span className="nav-item" data-effect="solid" data-tip="Species seen in NYC's CNC project that is missing from Philly"><Link to='/?a_project_id=city-nature-challenge-2018-new-york-city&b_project_id=philadelphia-city-bioblitz-2018'>NYC</Link></span><ReactTooltip />
+        <span className="nav-item" data-effect="solid" data-tip="Species seen in DC's CNC project that is missing from Philly"><Link to='/?a_project_id=city-nature-challenge-2018-washington-dc-metro-area&b_project_id=philadelphia-city-bioblitz-2018'>DC</Link></span><ReactTooltip />
+        <span className="nav-item" data-effect="solid" data-tip="Species seen in Pittsburgh's CNC project that is missing from Philly"><Link to='/?a_project_id=city-nature-challenge-2018-pittsburgh&b_project_id=philadelphia-city-bioblitz-2018'>Pittsburgh</Link></span><ReactTooltip />
+        <span className="nav-item" data-effect="solid" data-tip="Species seen in Boston's CNC project that is missing from Philly"><Link to='/?a_project_id=city-nature-challenge-2018-boston-area&b_project_id=philadelphia-city-bioblitz-2018'>Boston</Link></span><ReactTooltip />
+      </div>
+    )
+  }
+}
 
 class TaxonImageLarge extends Component {
   render() {
@@ -32,7 +47,7 @@ class TaxonText extends Component {
       <React.Fragment>
         <div className="taxon-text">
           <div className="taxon-info">
-            <a href={'https://www.inaturalist.org/observations?place_id=2983&subview=grid&view=&taxon_id=' + this.props.taxon.taxon.id + '&page='} target="_blank">
+            <a href={'https://www.inaturalist.org/observations?' + this.props.query + '&subview=grid&view=&taxon_id=' + this.props.taxon.taxon.id + '&page='} target="_blank">
               {this.props.taxon.count} Observations
             </a>
             <div className="copyright-info">
@@ -74,7 +89,7 @@ class Taxon extends Component {
         <a href={'https://www.inaturalist.org/taxa/' + this.props.taxon.taxon.id} target="_blank">
           <TaxonImage img={this.props.taxon.taxon.default_photo} alt={this.props.taxon.taxon.name}/>
         </a>
-        <TaxonText taxon={this.props.taxon} />
+        <TaxonText taxon={this.props.taxon} query={this.props.query}/>
       </div>
     );
   }
@@ -211,6 +226,15 @@ class Display extends Component {
       .catch(console.error);
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.props.location.search !== prevProps.location.search) {
+      this.setState({ results: [] });
+      this.callApi()
+        .then(res => this.setState({ results: res }))
+        .catch(console.error);
+    }
+  }
+
   callApi = async () => {
     //const queries = queryString.parse(this.props.location.search)
     //console.log(queries);
@@ -257,6 +281,12 @@ class Display extends Component {
     let simpleData = this.state.results;
     let resultCount = this.state.results.length;
 
+    const queries = queryString.parse(this.props.location.search)
+    const aQueries = Object.keys(queries).filter(query => query.startsWith('a_')).reduce((obj, key) => { return { ...obj, [key.substring(2)]: queries[key] }}, {});
+    let aQueryStr = queryString.stringify(aQueries);
+    if (!aQueryStr) aQueryStr = 'place_id=2983';
+    console.log(aQueryStr);
+
     if (this.props.filter.length > 0) {
       let filterTaxa = this.props.filter.map((name) => { return iconicTaxa[name]; });
       simpleData = simpleData.filter((taxon) => {
@@ -270,7 +300,7 @@ class Display extends Component {
       if (index < 0) { //Making this always false for now
         taxonElem = <React.Fragment><div key={key} className='col'><TaxonLarge taxon={taxon}/></div><div class="w-100"></div></React.Fragment>
       } else {
-        taxonElem = <div key={key} className='col-xs-2'><Taxon taxon={taxon}/></div>
+        taxonElem = <div key={key} className='col-xs-2'><Taxon taxon={taxon} query={aQueryStr}/></div>
       }
       return (
         taxonElem
@@ -318,7 +348,7 @@ class MainBody extends Component {
       <React.Fragment>
         <FilterBar onFilterBarChange={this.handleFilterChange} />
         <Switch>
-          <Route exact path='/' render={(props) => <Display {...props} filter={this.state.filters} />}/>
+          <Route path='/' render={(props) => <Display {...props} filter={this.state.filters} />}/>
         </Switch>
       </React.Fragment>
     )
@@ -326,11 +356,17 @@ class MainBody extends Component {
 }
 
 class App extends Component {
+
+  componentDidMount() {
+    document.title = 'Philly CNC';
+  }
+
   render() {
     return (
       <div className="App">
         <header className="App-header">
           <h1 className="App-title">Philly CNC</h1>
+          <NavBar />
         </header>
         <MainBody />
       </div>

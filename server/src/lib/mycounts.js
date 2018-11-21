@@ -3,51 +3,57 @@ const Observations = require('./Observations');
 let observations = new Observations();
 
 /* jshint ignore:start */
-const getTotals = async function(query, page = 1) {
+const getATotals = async function(query, page = 1) {
   let opts = {
-    place_id: query.place_id || 2983,
     verifiable: true,
     captive: false,
     page: page
   };
-  if (query.months) opts.month = query.months
+  if (query.a_place_id) opts.place_id = query.a_place_id;
+  if (query.a_project_id) opts.project_id = query.a_project_id;
+  if (!query.a_place_id && !query.a_project_id) opts.place_id = 2983;
+  if (query.a_user_id) opts.user_id = query.a_user_id;
+  if (query.a_months) opts.month = query.a_months;
 
   let response = await observations.speciesCounts(opts);
   let total = response.total_results;
   let perPage = response.per_page;
   let thisPage = response.page;
   if (total - (thisPage * perPage) > 0) {
-    return response.results.concat(await getTotals(query, thisPage + 1));
+    return response.results.concat(await getATotals(query, thisPage + 1));
   } else {
     return response.results;
   }
 };
 
-const getUserTotals = async function(query, page = 1) {
-  let userOpts = {
-    place_id: query.place_id || 2983,
-    user_id: query.user_id || 'navin_sasikumar',
+const getBTotals = async function(query, page = 1) {
+  let opts = {
     verifiable: true,
     captive: false,
     page: page
   };
+  if (query.b_place_id) opts.place_id = query.b_place_id;
+  if (query.b_project_id) opts.project_id = query.b_project_id;
+  if (query.b_user_id) opts.user_id = query.b_user_id;
+  if (query.b_months) opts.month = query.b_months;
+  if (!query.b_place_id && !query.b_project_id) return [];
 
-  let response = await observations.speciesCounts(userOpts);
+  let response = await observations.speciesCounts(opts);
   let total = response.total_results;
   let perPage = response.per_page;
   let thisPage = response.page;
   if (total - (thisPage * perPage) > 0) {
-    return response.results.concat(await getUserTotals(query, thisPage + 1));
+    return response.results.concat(await getBTotals(query, thisPage + 1));
   } else {
     return response.results;
   }
 };
 
 const missingSpecies = async function(query) {
-  const [totals, userTotals] = await Promise.all([getTotals(query), getUserTotals(query)]);
-  let userTaxa = userTotals.map(function(taxon) { return taxon.taxon.name });
-  let minus = totals.filter(function(taxon) {
-    return userTaxa.indexOf(taxon.taxon.name) < 0;
+  const [aTotals, bTotals] = await Promise.all([getATotals(query), getBTotals(query)]);
+  let bTaxa = bTotals.map(function(taxon) { return taxon.taxon.name });
+  let minus = aTotals.filter(function(taxon) {
+    return bTaxa.indexOf(taxon.taxon.name) < 0;
   });
   return minus;
 };

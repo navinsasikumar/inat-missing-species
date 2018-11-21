@@ -13,10 +13,13 @@
   height: 70px;
   padding: 20px;
   color: white;
+  text-align: left;
 }
 
 .App-title {
   font-size: 1.5em;
+  text-align: left;
+  display: inline-block;
 }
 
 .App-intro {
@@ -26,6 +29,19 @@
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+.navbar-links {
+  display: inline-block;
+  float: right;
+}
+
+.nav-item {
+  padding: 0 10px;
+}
+
+.nav-item a {
+  color: white;
 }
 
 img {
