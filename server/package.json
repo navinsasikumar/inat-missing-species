@@ -11,6 +11,7 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.16.2",
+    "node-cache": "^4.2.0",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5"
   },

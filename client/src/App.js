@@ -11,11 +11,11 @@ class NavBar extends Component {
     return (
       <div className="navbar-links">
         <span className="nav-item"><Link to='/'>Home</Link></span>
-        <span className="nav-item" data-effect="solid" data-tip="Species seen in Philly not yet observed during the CNC"><Link to='/?a_months=4,5&b_project_id=philadelphia-city-bioblitz-2018'>Philly</Link></span><ReactTooltip />
-        <span className="nav-item" data-effect="solid" data-tip="Species seen in NYC's CNC project that is missing from Philly"><Link to='/?a_project_id=city-nature-challenge-2018-new-york-city&b_project_id=philadelphia-city-bioblitz-2018'>NYC</Link></span><ReactTooltip />
-        <span className="nav-item" data-effect="solid" data-tip="Species seen in DC's CNC project that is missing from Philly"><Link to='/?a_project_id=city-nature-challenge-2018-washington-dc-metro-area&b_project_id=philadelphia-city-bioblitz-2018'>DC</Link></span><ReactTooltip />
-        <span className="nav-item" data-effect="solid" data-tip="Species seen in Pittsburgh's CNC project that is missing from Philly"><Link to='/?a_project_id=city-nature-challenge-2018-pittsburgh&b_project_id=philadelphia-city-bioblitz-2018'>Pittsburgh</Link></span><ReactTooltip />
-        <span className="nav-item" data-effect="solid" data-tip="Species seen in Boston's CNC project that is missing from Philly"><Link to='/?a_project_id=city-nature-challenge-2018-boston-area&b_project_id=philadelphia-city-bioblitz-2018'>Boston</Link></span><ReactTooltip />
+        <span className="nav-item" data-effect="solid" data-tip="Species seen in Philly not yet observed during the CNC"><Link to='/?a_months=4,5&b_project_id=city-nature-challenge-2019-greater-philadelphia-area'>Philly</Link></span><ReactTooltip />
+        <span className="nav-item" data-effect="solid" data-tip="Species seen in NYC's CNC project that is missing from Philly"><Link to='/?a_project_id=city-nature-challenge-2019-new-york-city&b_project_id=city-nature-challenge-2019-greater-philadelphia-area'>NYC</Link></span><ReactTooltip />
+        <span className="nav-item" data-effect="solid" data-tip="Species seen in DC's CNC project that is missing from Philly"><Link to='/?a_project_id=city-nature-challenge-2019-washington-dc-metro-area&b_project_id=city-nature-challenge-2019-greater-philadelphia-area'>DC</Link></span><ReactTooltip />
+        <span className="nav-item" data-effect="solid" data-tip="Species seen in Pittsburgh's CNC project that is missing from Philly"><Link to='/?a_project_id=city-nature-challenge-2019-pittsburgh&b_project_id=city-nature-challenge-2019-greater-philadelphia-area'>Pittsburgh</Link></span><ReactTooltip />
+        <span className="nav-item" data-effect="solid" data-tip="Species seen in Boston's CNC project that is missing from Philly"><Link to='/?a_project_id=city-nature-challenge-2019-boston-area&b_project_id=city-nature-challenge-2019-greater-philadelphia-area'>Boston</Link></span><ReactTooltip />
       </div>
     )
   }
@@ -107,10 +107,11 @@ class ResultsDisplay extends Component {
 
   loadItems(page) {
     console.log('Loading items: ' + page);
+    let loading = this.props.loading;
     let dispCount = this.props.dispCount || 25;
     let smallResults = this.props.results.slice(0, page * dispCount || dispCount);
     let hasMore = this.props.results.length > page * dispCount;
-    let resultsDisp = this.props.count > 0 ? smallResults : <div className='col'>Loading ...</div>;
+    let resultsDisp = this.props.count > 0 || !loading ? smallResults : <div className='col'>Loading ...</div>;
     this.setState({ results: resultsDisp, hasMore: hasMore });
     return resultsDisp;
   }
@@ -119,7 +120,7 @@ class ResultsDisplay extends Component {
     const loader = <div key={this.props.results.length} className="loader">Loading ...</div>;
     //let resultsDisp = this.loadItems(1);
 
-    if (this.props.count > 0) {
+    if (this.props.count > 0 || !this.props.loading) {
       return (
         <InfiniteScroll
                   pageStart={0}
@@ -187,7 +188,7 @@ class FilterBar extends Component {
   render() {
     return (
       <div className="container-fluid">
-        <div className="row white-bg">
+        <div className="row light-grey-bg">
           <div className="col">
             <form>
               <FormCheckBox type="plants" onFilterChange={this.handleFilterChange} />
@@ -216,21 +217,23 @@ class Display extends Component {
     super();
 
     this.state = {
-      results: []
+      results: [],
+      loading: false
     };
   }
 
   componentDidMount() {
+    this.setState({ loading: true });
     this.callApi()
-      .then(res => this.setState({ results: res }))
+      .then(res => this.setState({ results: res, loading: false }))
       .catch(console.error);
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.location.search !== prevProps.location.search) {
-      this.setState({ results: [] });
+      this.setState({ results: [], loading: true });
       this.callApi()
-        .then(res => this.setState({ results: res }))
+        .then(res => this.setState({ results: res, loading: false }))
         .catch(console.error);
     }
   }
@@ -280,9 +283,11 @@ class Display extends Component {
 
     let simpleData = this.state.results;
     let resultCount = this.state.results.length;
+    let loading = this.state.loading;
 
-    const queries = queryString.parse(this.props.location.search)
-    const aQueries = Object.keys(queries).filter(query => query.startsWith('a_')).reduce((obj, key) => { return { ...obj, [key.substring(2)]: queries[key] }}, {});
+    const queries = queryString.parse(this.props.location.search);
+    console.log(queries);
+    const aQueries = Object.keys(queries).filter(query => query.startsWith('a_') && query !== 'a_taxon_id').reduce((obj, key) => { return { ...obj, [key.substring(2)]: queries[key] }}, {});
     let aQueryStr = queryString.stringify(aQueries);
     if (!aQueryStr) aQueryStr = 'place_id=2983';
     console.log(aQueryStr);
@@ -313,7 +318,7 @@ class Display extends Component {
     return (
       <React.Fragment>
         <StatusBar results={simpleData} />
-        <ResultsDisplay results={simpleData} count={resultCount} dispCount={dispCount} key={key}/>
+        <ResultsDisplay results={simpleData} count={resultCount} dispCount={dispCount} loading={loading} key={key}/>
       </React.Fragment>
     );
   }

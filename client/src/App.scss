@@ -1,6 +1,6 @@
 .App {
   text-align: center;
-  background-color: #eee;
+  background-color: #1B1D22;
 }
 
 .App-logo {
@@ -9,7 +9,7 @@
 }
 
 .App-header {
-  background-color: #222;
+  background-color: #1E2026;
   height: 70px;
   padding: 20px;
   color: white;
@@ -92,7 +92,7 @@ img {
 }
 
 .taxon-square {
-  background-color: #fff;
+  background-color: #17181C;
   margin: 5px;
   position: relative;
 }
@@ -116,7 +116,7 @@ img {
 }
 
 .taxon-names a {
-  color: black;
+  color: #E8E7E3;
   text-decoration: none;
 }
 
@@ -127,7 +127,7 @@ img {
 
 .latin-name {
   font-style: italic;
-  color: #333;
+  color: #D5D2CD;
 }
 
 .copyright-info {
@@ -135,13 +135,14 @@ img {
   float: right;
 }
 
-.white-bg {
-  background-color: #fff;
+.light-grey-bg {
+  background-color: #17181C;
+  color: #D9D7D3;
 }
 
 .dark-grey-bg {
-  background-color: #222;
-  color: #eee;
+  background-color: #1E2026;
+  color: #EFEFED;
 }
 
 .Iconic-taxa-name {
