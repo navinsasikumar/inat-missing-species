@@ -5,7 +5,12 @@ FROM node:9.4.0-alpine as client
 
 WORKDIR /usr/app/client/
 COPY client/package*.json ./
-RUN npm install -qy
+#RUN npm install -qy
+RUN apk --no-cache add --virtual native-deps \
+  g++ gcc libgcc libstdc++ linux-headers make python2 && \
+  npm install --quiet node-gyp -g &&\
+  npm install -qy && \
+  apk del native-deps
 COPY client/ ./
 RUN npm run build
 
