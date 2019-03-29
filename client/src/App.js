@@ -10,8 +10,7 @@ class NavBar extends Component {
   render() {
     return (
       <div className="navbar-links">
-        <span className="nav-item"><Link to='/'>Home</Link></span>
-        <span className="nav-item" data-effect="solid" data-tip="Species seen in Philly not yet observed during the CNC"><Link to='/?a_months=4,5&b_project_id=city-nature-challenge-2019-greater-philadelphia-area'>Philly</Link></span><ReactTooltip />
+        <span className="nav-item" data-effect="solid" data-tip="Species seen in Philly not yet observed during the CNC"><Link to='/?a_months=4,5&b_project_id=city-nature-challenge-2019-greater-philadelphia-area'>Home</Link></span><ReactTooltip />
         <span className="nav-item" data-effect="solid" data-tip="Species seen in NYC's CNC project that is missing from Philly"><Link to='/?a_project_id=city-nature-challenge-2019-new-york-city&b_project_id=city-nature-challenge-2019-greater-philadelphia-area'>NYC</Link></span><ReactTooltip />
         <span className="nav-item" data-effect="solid" data-tip="Species seen in DC's CNC project that is missing from Philly"><Link to='/?a_project_id=city-nature-challenge-2019-washington-dc-metro-area&b_project_id=city-nature-challenge-2019-greater-philadelphia-area'>DC</Link></span><ReactTooltip />
         <span className="nav-item" data-effect="solid" data-tip="Species seen in Pittsburgh's CNC project that is missing from Philly"><Link to='/?a_project_id=city-nature-challenge-2019-pittsburgh&b_project_id=city-nature-challenge-2019-greater-philadelphia-area'>Pittsburgh</Link></span><ReactTooltip />

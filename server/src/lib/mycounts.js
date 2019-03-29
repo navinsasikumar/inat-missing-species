@@ -12,6 +12,11 @@ const getATotals = async function(query, page = 1) {
     captive: false,
     page: page
   };
+  if (Object.keys(query).length === 0) {
+    console.log('No query keys');
+    query.a_months = '4,5';
+    query.b_project_id = 'city-nature-challenge-2019-greater-philadelphia-area';
+  }
   if (query.a_place_id) opts.place_id = query.a_place_id;
   if (query.a_project_id) opts.project_id = query.a_project_id;
   if (!query.a_place_id && !query.a_project_id) {

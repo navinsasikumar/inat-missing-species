@@ -21,7 +21,7 @@
     "eject": "react-scripts eject",
     "build-css": "node-sass --include-path ./src  --include-path ./node_modules src/ -o src/compiled",
     "watch-css": "npm run build-css && node-sass --include-path ./src --include-path ./node_modules src/ -o src/compiled/ --watch",
-    "start-js": "react-scripts start",
+    "start-js": "set HTTPS=true&&react-scripts start",
     "build-js": "react-scripts build"
   },
   "proxy": "http://server:8080",
