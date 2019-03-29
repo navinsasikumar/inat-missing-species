@@ -52,7 +52,7 @@ img {
   text-align: left;
 }
 
-.loader {
+.loader, .col {
   color: white;
 }
 
@@ -151,4 +151,8 @@ img {
 
 .Iconic-taxa-name {
   text-transform: capitalize;
+}
+
+.form-col {
+  min-width: 350px;
 }

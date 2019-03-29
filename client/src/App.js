@@ -188,7 +188,7 @@ class FilterBar extends Component {
     return (
       <div className="container-fluid">
         <div className="row light-grey-bg">
-          <div className="col">
+          <div className="col form-col">
             <form>
               <FormCheckBox type="plants" onFilterChange={this.handleFilterChange} />
               <FormCheckBox type="mammals" onFilterChange={this.handleFilterChange} />
@@ -238,7 +238,6 @@ class Display extends Component {
   }
 
   handlePaths = (location, params) => {
-    const path = location.pathname.substring(1);
     const queryStr = location.search;
     const username = params.username;
     const place = params.place;
