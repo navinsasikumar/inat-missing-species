@@ -237,10 +237,35 @@ class Display extends Component {
     }
   }
 
+  handlePaths = (location, params) => {
+    const path = location.pathname.substring(1);
+    const queryStr = location.search;
+    const username = params.username;
+    const place = params.place;
+    let newQueryStr = '';
+    if (username && place) {
+      newQueryStr = 'b_user_id=' + username;
+      switch(place) {
+        case 'philadelphia':
+          newQueryStr += '&b_place_id=2983&a_place_id=2983';
+          break;
+        default:
+          newQueryStr += '&b_place_id=' + place + '&a_place_id=' + place;
+      }
+    }
+    if (queryStr.startsWith('?')) {
+      return queryStr + '&' + newQueryStr;
+    } else if (newQueryStr) {
+      return '?' + newQueryStr;
+    }
+    return queryStr;
+  }
+
   callApi = async () => {
     //const queries = queryString.parse(this.props.location.search)
     //console.log(queries);
-    let url = '/api/observations/species' + this.props.location.search;
+    const queryStr = this.handlePaths(this.props.location, this.props.match.params);
+    let url = '/api/observations/species' + queryStr;
     const resp = await fetch(url);
 
     window._resp = resp;
@@ -258,12 +283,10 @@ class Display extends Component {
       throw Error(data ? data.message : 'No data');
     }
 
-    console.log(data);
     return data;
   };
 
   render() {
-    console.log(this.props);
     const iconicTaxa = {
       plants: 47126,
       reptiles: 26036,
@@ -285,11 +308,9 @@ class Display extends Component {
     let loading = this.state.loading;
 
     const queries = queryString.parse(this.props.location.search);
-    console.log(queries);
     const aQueries = Object.keys(queries).filter(query => query.startsWith('a_') && query !== 'a_taxon_id').reduce((obj, key) => { return { ...obj, [key.substring(2)]: queries[key] }}, {});
     let aQueryStr = queryString.stringify(aQueries);
     if (!aQueryStr) aQueryStr = 'place_id=2983';
-    console.log(aQueryStr);
 
     if (this.props.filter.length > 0) {
       let filterTaxa = this.props.filter.map((name) => { return iconicTaxa[name]; });
@@ -333,7 +354,6 @@ class MainBody extends Component {
   }
 
   handleFilterChange(type, checked) {
-    console.log('MainBody: ' + type + ', ' + checked);
     let filters = this.state.filters;
     if (checked) {
       filters.push(type)
@@ -344,7 +364,6 @@ class MainBody extends Component {
       }
     }
     this.setState({filters: filters});
-    console.log(this.state.filters);
   }
 
   render() {
@@ -352,6 +371,7 @@ class MainBody extends Component {
       <React.Fragment>
         <FilterBar onFilterBarChange={this.handleFilterChange} />
         <Switch>
+          <Route path='/user/:username/place/:place' render={(props) => <Display {...props} filter={this.state.filters} />}/>
           <Route path='/' render={(props) => <Display {...props} filter={this.state.filters} />}/>
         </Switch>
       </React.Fragment>
