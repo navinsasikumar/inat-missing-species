@@ -167,8 +167,8 @@ class FormCheckBox extends Component {
   render () {
     return (
       <div className="form-group form-check form-check-inline">
-        <input className="form-check-input" type="checkbox" id="{this.props.type}-check" name={this.props.type} value={this.props.type} onChange={this.handleChange} />
-        <label className="form-check-label" htmlFor="{this.props.type}-check"><span className="Iconic-taxa-name">{this.props.type}</span></label>
+        <input className="form-check-input" type="checkbox" id={this.props.type + '-check'} name={this.props.type} value={this.props.type} onChange={this.handleChange} />
+        <label className="form-check-label" htmlFor={this.props.type + '-check'}><span className="Iconic-taxa-name">{this.props.type}</span></label>
       </div>
     )
   }
