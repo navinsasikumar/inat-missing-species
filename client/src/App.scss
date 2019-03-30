@@ -62,14 +62,14 @@ img {
 }
 
 .crop {
-  height: 210px;
-  width: 210px;
+  height: 165px;
+  width: 165px;
   overflow: hidden;
 }
 
 .crop img {
-  height: 210px;
-  width: 210px;
+  height: 165px;
+  width: 165px;
   object-fit: cover;
 }
 
@@ -88,7 +88,7 @@ img {
 
 .taxon-text {
   font-size: 14px;
-  width: 210px;
+  width: 165px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -99,6 +99,7 @@ img {
   background-color: #17181C;
   margin: 5px;
   position: relative;
+  clear: both;
 }
 
 .taxon-info {
@@ -155,4 +156,27 @@ img {
 
 .clear {
   clear: both;
+}
+
+@media (min-width: 768px) {
+  .crop {
+    height: 210px;
+    width: 210px;
+    overflow: hidden;
+  }
+
+  .crop img {
+    height: 210px;
+    width: 210px;
+    object-fit: cover;
+  }
+
+  .taxon-text {
+    font-size: 14px;
+    width: 210px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+  }
 }
