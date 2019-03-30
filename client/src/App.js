@@ -147,6 +147,9 @@ class StatusBar extends Component {
     return (
       <div className="container-fluid">
         <div className="row">
+          <div className="col dark-grey-bg">Target Species (this page is updated every 30 minutes)</div>
+        </div>
+        <div className="row">
           <div className="col dark-grey-bg">Total: {this.props.results.length}</div>
         </div>
       </div>
