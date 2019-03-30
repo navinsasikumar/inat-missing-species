@@ -188,7 +188,7 @@ class FilterBar extends Component {
     return (
       <div className="container-fluid">
         <div className="row light-grey-bg">
-          <div className="col form-col">
+          <div className="col">
             <form>
               <FormCheckBox type="plants" onFilterChange={this.handleFilterChange} />
               <FormCheckBox type="mammals" onFilterChange={this.handleFilterChange} />
@@ -391,6 +391,7 @@ class App extends Component {
           <h1 className="App-title">Philly CNC</h1>
           <NavBar />
         </header>
+        <div className="clear"></div>
         <MainBody />
       </div>
     );
