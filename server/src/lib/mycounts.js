@@ -5,12 +5,18 @@ const myCache = new NodeCache();
 
 let observations = new Observations();
 
-/* jshint ignore:start */
-const getATotals = async function(query, page = 1) {
-  let opts = {
+Object.defineProperty(Array.prototype, 'flat', {
+  value: function(depth = 1) {
+    return this.reduce(function (flat, toFlatten) {
+      return flat.concat((Array.isArray(toFlatten) && (depth>1)) ? toFlatten.flat(depth-1) : toFlatten);
+    }, []);
+  }
+});
+
+const getAOpts = (query) => {
+  const opts = {
     verifiable: true,
     captive: false,
-    page: page
   };
   if (Object.keys(query).length === 0) {
     console.log('No query keys');
@@ -29,14 +35,36 @@ const getATotals = async function(query, page = 1) {
   if (query.a_months) opts.month = query.a_months;
   if (query.a_taxon_id) opts.taxon_id = query.a_taxon_id;
 
-  let response = await observations.speciesCounts(opts);
-  let total = response.total_results;
-  let perPage = response.per_page;
-  let thisPage = response.page;
-  if (total - (thisPage * perPage) > 0) {
-    return response.results.concat(await getATotals(query, thisPage + 1));
-  } else {
+  return opts;
+}
+
+/* jshint ignore:start */
+const getATotals = async function (query, page = 1) {
+  try {
+    const opts = getAOpts(query);
+    opts.page = page;
+
+    const response = await observations.speciesCounts(opts);
+
+    if (page === 1) {
+      const total = response.total_results;
+      const perPage = response.per_page;
+      const thisPage = response.page;
+      console.log(`A: Total: ${total}, perPage: ${perPage}, thisPage: ${thisPage}`);
+      console.log(`A: Pages: ${Math.ceil(total / perPage)}`);
+      const pages = Math.ceil(total / perPage);
+      const promises = [];
+      for (let i = 2; i <= pages; i += 1) {
+        promises.push(getATotals(query, i));
+      }
+      const resultPages = await Promise.all(promises);
+      return [...response.results, ...resultPages.flat()];
+    }
+
     return response.results;
+  } catch (e) {
+    console.log(e);
+    return [];
   }
 };
 
@@ -53,21 +81,35 @@ const getBTotals = async function(query, page = 1) {
   if (query.b_taxon_id) opts.taxon_id = query.b_taxon_id;
   if (!query.b_place_id && !query.b_project_id) return [];
 
-  let response = await observations.speciesCounts(opts);
-  let total = response.total_results;
-  let perPage = response.per_page;
-  let thisPage = response.page;
-  if (total - (thisPage * perPage) > 0) {
-    return response.results.concat(await getBTotals(query, thisPage + 1));
-  } else {
+  const response = await observations.speciesCounts(opts);
+
+  try {
+    if (page === 1) {
+      const total = response.total_results;
+      const perPage = response.per_page;
+      const thisPage = response.page;
+      console.log(`B: Total: ${total}, perPage: ${perPage}, thisPage: ${thisPage}`);
+      console.log(`B: Pages: ${Math.ceil(total / perPage)}`);
+      const pages = Math.ceil(total / perPage);
+      const promises = [];
+      for (let i = 2; i <= pages; i += 1) {
+        promises.push(getBTotals(query, i));
+      }
+      const resultPages = await Promise.all(promises);
+      return [...response.results, ...resultPages.flat()];
+    }
+
     return response.results;
+  } catch (e) {
+    console.log(e);
+    return [];
   }
 };
 
 const missingSpecies = async function(query) {
-  console.log(query);
+  console.log(`Query: ${JSON.stringify(query)}`);
   var queryJSON = JSON.stringify(query);
-  console.log(queryJSON);
+  console.log(`Query JSON: ${queryJSON}`);
   let minus = myCache.get(queryJSON);
   if (minus == undefined) {
     console.log('Cache miss');
@@ -77,6 +119,8 @@ const missingSpecies = async function(query) {
       return bTaxa.indexOf(taxon.taxon.name) < 0;
     });
     myCache.set(queryJSON, minus, 1800);
+  } else {
+    console.log('Cache hit!');
   }
   return minus;
 };
