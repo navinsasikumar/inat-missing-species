@@ -6,15 +6,28 @@ import { Switch, Route, Link } from 'react-router-dom'
 import queryString from 'query-string'
 import './compiled/App.css';
 
+export const HOST_CITY = process.env.REACT_APP_HOST_CITY_NAME;
+export const HOST_PROJECT = process.env.REACT_APP_HOST_PROJECT;
+export const HOST_CITY_FULL =  process.env.REACT_APP_HOST_CITY_NAME_FULL || process.env.REACT_APP_HOST_CITY_NAME;
+export const HOST_CITY_ID =  process.env.REACT_APP_HOST_CITY_PLACE_ID;
+export const COMPETE_CITY_1_NAME = process.env.REACT_APP_COMPETE_CITY_1_NAME;
+export const COMPETE_CITY_1_PROJECT = process.env.REACT_APP_COMPETE_CITY_1_PROJECT;
+export const COMPETE_CITY_2_NAME = process.env.REACT_APP_COMPETE_CITY_2_NAME;
+export const COMPETE_CITY_2_PROJECT = process.env.REACT_APP_COMPETE_CITY_2_PROJECT;
+export const COMPETE_CITY_3_NAME = process.env.REACT_APP_COMPETE_CITY_3_NAME;
+export const COMPETE_CITY_3_PROJECT = process.env.REACT_APP_COMPETE_CITY_3_PROJECT;
+export const COMPETE_CITY_4_NAME = process.env.REACT_APP_COMPETE_CITY_4_NAME;
+export const COMPETE_CITY_4_PROJECT = process.env.REACT_APP_COMPETE_CITY_4_PROJECT;
+
 class NavBar extends Component {
   render() {
     return (
       <div className="navbar-links">
-        <span className="nav-item" data-effect="solid" data-tip="Species seen in Philly not yet observed during the CNC"><Link to='/?a_months=4,5&b_project_id=city-nature-challenge-2019-greater-philadelphia-area'>Home</Link></span><ReactTooltip />
-        <span className="nav-item" data-effect="solid" data-tip="Species seen in NYC's CNC project that is missing from Philly"><Link to='/?a_project_id=city-nature-challenge-2019-new-york-city&b_project_id=city-nature-challenge-2019-greater-philadelphia-area'>NYC</Link></span><ReactTooltip />
-        <span className="nav-item" data-effect="solid" data-tip="Species seen in DC's CNC project that is missing from Philly"><Link to='/?a_project_id=city-nature-challenge-2019-washington-dc-metro-area&b_project_id=city-nature-challenge-2019-greater-philadelphia-area'>DC</Link></span><ReactTooltip />
-        <span className="nav-item" data-effect="solid" data-tip="Species seen in Pittsburgh's CNC project that is missing from Philly"><Link to='/?a_project_id=city-nature-challenge-2019-pittsburgh&b_project_id=city-nature-challenge-2019-greater-philadelphia-area'>Pittsburgh</Link></span><ReactTooltip />
-        <span className="nav-item" data-effect="solid" data-tip="Species seen in Boston's CNC project that is missing from Philly"><Link to='/?a_project_id=city-nature-challenge-2019-boston-area&b_project_id=city-nature-challenge-2019-greater-philadelphia-area'>Boston</Link></span><ReactTooltip />
+        <span className="nav-item" data-effect="solid" data-tip={`Species seen in ${HOST_CITY} not yet observed during the CNC`}><Link to={`/?a_months=4,5&b_project_id=${HOST_PROJECT}`}>Home</Link></span><ReactTooltip />
+        <span className="nav-item" data-effect="solid" data-tip={`Species seen in ${COMPETE_CITY_1_NAME}'s CNC project that is missing from ${HOST_CITY}`}><Link to={`/?a_project_id=${COMPETE_CITY_1_PROJECT}&b_project_id=${HOST_PROJECT}`}>{COMPETE_CITY_1_NAME}</Link></span><ReactTooltip />
+        <span className="nav-item" data-effect="solid" data-tip={`Species seen in ${COMPETE_CITY_2_NAME}'s CNC project that is missing from ${HOST_CITY}`}><Link to={`/?a_project_id=${COMPETE_CITY_2_PROJECT}&b_project_id=${HOST_PROJECT}`}>{COMPETE_CITY_2_NAME}</Link></span><ReactTooltip />
+        <span className="nav-item" data-effect="solid" data-tip={`Species seen in ${COMPETE_CITY_3_NAME}'s CNC project that is missing from ${HOST_CITY}`}><Link to={`/?a_project_id=${COMPETE_CITY_3_PROJECT}&b_project_id=${HOST_PROJECT}`}>{COMPETE_CITY_3_NAME}</Link></span><ReactTooltip />
+        <span className="nav-item" data-effect="solid" data-tip={`Species seen in ${COMPETE_CITY_4_NAME}'s CNC project that is missing from ${HOST_CITY}`}><Link to={`/?a_project_id=${COMPETE_CITY_4_PROJECT}&b_project_id=${HOST_PROJECT}`}>{COMPETE_CITY_4_NAME}</Link></span><ReactTooltip />
       </div>
     )
   }
@@ -248,8 +261,8 @@ class Display extends Component {
     if (username && place) {
       newQueryStr = 'b_user_id=' + username;
       switch(place) {
-        case 'philadelphia':
-          newQueryStr += '&b_place_id=2983&a_place_id=2983';
+        case HOST_CITY_FULL:
+          newQueryStr += `&b_place_id=${HOST_CITY_ID}&a_place_id=${HOST_CITY_ID}`;
           break;
         default:
           newQueryStr += '&b_place_id=' + place + '&a_place_id=' + place;
@@ -312,7 +325,7 @@ class Display extends Component {
     const queries = queryString.parse(this.props.location.search);
     const aQueries = Object.keys(queries).filter(query => query.startsWith('a_') && query !== 'a_taxon_id').reduce((obj, key) => { return { ...obj, [key.substring(2)]: queries[key] }}, {});
     let aQueryStr = queryString.stringify(aQueries);
-    if (!aQueryStr) aQueryStr = 'place_id=2983';
+    if (!aQueryStr) aQueryStr = `place_id=${HOST_CITY_FULL}`;
 
     if (this.props.filter.length > 0) {
       let filterTaxa = this.props.filter.map((name) => { return iconicTaxa[name]; });
@@ -384,14 +397,14 @@ class MainBody extends Component {
 class App extends Component {
 
   componentDidMount() {
-    document.title = 'Philly CNC';
+    document.title = `${HOST_CITY} CNC`;
   }
 
   render() {
     return (
       <div className="App">
         <header className="App-header">
-          <h1 className="App-title">Philly CNC</h1>
+          <h1 className="App-title">{HOST_CITY} CNC</h1>
           <NavBar />
         </header>
         <div className="clear"></div>
