@@ -1,4 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
+
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import InfiniteScroll from 'react-infinite-scroller';
@@ -8,6 +10,7 @@ import {
 } from 'react-bootstrap';
 import { Switch, Route, Link } from 'react-router-dom';
 import queryString from 'query-string';
+import Loader from 'react-loader-spinner';
 import './compiled/App.css';
 
 export const HOST_CITY = process.env.REACT_APP_HOST_CITY_NAME;
@@ -221,7 +224,20 @@ class ResultsDisplay extends Component {
     } else {
       return (
         <div className="container">
-          <div className="row grid"><div className="col">Loading ... </div></div>
+          <div className="row grid">
+            <div className="col">
+              Loading ...
+              <div className="spinner">
+                <Loader
+                 type="Plane"
+                 color="#ffb733"
+                 height={300}
+                 width={300}
+                 timeout={30000} // 3 secs
+                />
+              </div>
+            </div>
+          </div>
         </div>
       )
     }
