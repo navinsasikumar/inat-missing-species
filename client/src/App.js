@@ -45,9 +45,9 @@ class NavDropdownItem extends Component {
   render() {
     if (this.props.city === 'host') {
       return (
-        <Button variant="link">
+        <span>
           <span className="nav-item" data-effect="solid" data-tip={`Species seen in ${HOST_CITY} not yet observed during the CNC`}><Link to={`/?a_months=4,5&b_project_id=${HOST_PROJECT}`}>Home</Link></span><ReactTooltip />
-        </Button>
+        </span>
       );
     }
 
@@ -106,9 +106,9 @@ class HeaderBar extends Component {
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse className="justify-content-end" id="responsive-navbar-nav">
           <Nav className="justify-content-end">
-            <Nav.Link href="#home"><Navbar.Text>
+            <Navbar.Text><Nav.Link href="#home">
               <NavDropdownItem city="host" />
-            </Navbar.Text></Nav.Link>
+            </Nav.Link></Navbar.Text>
             <Navbar.Text>
               <NavDropdownItem city={COMPETE_CITY_1_NAME} project={COMPETE_CITY_1_PROJECT} place={COMPETE_CITY_1_PLACE} align="alignRight" />
             </Navbar.Text>
