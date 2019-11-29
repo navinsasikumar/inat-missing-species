@@ -268,7 +268,7 @@ class StatusBar extends Component {
     return (
       <div className="container-fluid">
         <div className="row">
-          <div className="col dark-grey-bg">Target Species (this page is updated every 30 minutes)</div>
+          <div className="col dark-grey-bg extra-padding-top">Target Species (this page is updated every 30 minutes)</div>
         </div>
         <div className="row">
           <div className="col dark-grey-bg">Total: {this.props.results.length}</div>
@@ -313,7 +313,7 @@ class FilterBar extends Component {
       <div className="container-fluid">
         <div className="row light-grey-bg">
           <div className="col">
-            <form>
+            <form className="extra-padding-top">
               <FormCheckBox type="plants" onFilterChange={this.handleFilterChange} />
               <FormCheckBox type="mammals" onFilterChange={this.handleFilterChange} />
               <FormCheckBox type="birds" onFilterChange={this.handleFilterChange} />
