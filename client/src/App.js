@@ -6,7 +6,11 @@ import PropTypes from 'prop-types';
 import InfiniteScroll from 'react-infinite-scroller';
 import ReactTooltip from 'react-tooltip';
 import {
-  Button, ButtonToolbar, DropdownButton, Dropdown,
+  Button,
+  ButtonToolbar,
+  Navbar,
+  Nav,
+  NavDropdown,
 } from 'react-bootstrap';
 import { Switch, Route, Link } from 'react-router-dom';
 import queryString from 'query-string';
@@ -53,60 +57,75 @@ class NavDropdownItem extends Component {
       title: this.props.city,
       key: this.props.city,
       variant: 'link',
+      bg: 'dark',
     };
     if (this.props.align === 'alignRight') {
       dropdownProps.alignRight = true;
     }
 
     return (
-      <DropdownButton {...dropdownProps}>
-        <Dropdown.Item as="button">
+      <NavDropdown {...dropdownProps}>
+        <NavDropdown.Item as="button">
           <span data-effect="solid" data-tip={`Species seen in ${this.props.city}'s CNC project that are missing from ${HOST_CITY}'s CNC Project`}>
             <Link to={`/?a_project_id=${this.props.project}&b_project_id=${HOST_PROJECT}`}>
               Project Comparison
             </Link>
           </span>
         <ReactTooltip />
-        </Dropdown.Item>
-        <Dropdown.Item as="button">
+        </NavDropdown.Item>
+        <NavDropdown.Item as="button">
           <span data-effect="solid" data-tip={`Species seen in ${this.props.city} that are missing from ${HOST_CITY}`}>
             <Link to={`/?a_place_id=${this.props.place}&b_place_id=${HOST_PROJECT_PLACE}`}>
               City Comparison
             </Link>
           </span>
-        </Dropdown.Item>
-        <Dropdown.Item as="button">
+        </NavDropdown.Item>
+        <NavDropdown.Item as="button">
           <span data-effect="solid" data-tip={`Species seen in ${this.props.city} that are missing from ${HOST_CITY}'s CNC Project`}>
             <Link to={`/?a_place_id=${this.props.place}&b_project_id=${HOST_PROJECT}`}>
               Project-City Comparison
             </Link>
           </span>
-        </Dropdown.Item>
-        <Dropdown.Item as="button">
+        </NavDropdown.Item>
+        <NavDropdown.Item as="button">
           <span data-effect="solid" data-tip={`Species seen in ${this.props.city} in April and May that are missing from ${HOST_CITY}'s CNC Project`}>
             <Link to={`/?a_place_id=${this.props.place}&a_months=4,5&b_project_id=${HOST_PROJECT}`}>
               Project-City Comparison (Apr, May)
             </Link>
           </span>
-        </Dropdown.Item>
-      </DropdownButton>
+        </NavDropdown.Item>
+      </NavDropdown>
     );
   }
 }
 
-class NavBar extends Component {
+class HeaderBar extends Component {
   render() {
     return (
-      <div className="navbar-links">
-        <ButtonToolbar>
-          <NavDropdownItem city="host" />
-          <NavDropdownItem city={COMPETE_CITY_1_NAME} project={COMPETE_CITY_1_PROJECT} place={COMPETE_CITY_1_PLACE} align="alignRight" />
-          <NavDropdownItem city={COMPETE_CITY_2_NAME} project={COMPETE_CITY_2_PROJECT} place={COMPETE_CITY_2_PLACE} align="alignRight" />
-          <NavDropdownItem city={COMPETE_CITY_3_NAME} project={COMPETE_CITY_3_PROJECT} place={COMPETE_CITY_3_PLACE} align="alignRight" />
-          <NavDropdownItem city={COMPETE_CITY_4_NAME} project={COMPETE_CITY_4_PROJECT} place={COMPETE_CITY_4_PLACE} align="alignRight" />
-        </ButtonToolbar>
-      </div>
-    )
+      <Navbar bg="dark" variant="dark" expand="lg">
+        <Navbar.Brand href="/">{HOST_CITY} CNC</Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse className="justify-content-end">
+          <Nav className="justify-content-end">
+            <Navbar.Text>
+              <NavDropdownItem city="host" />
+            </Navbar.Text>
+            <Navbar.Text>
+              <NavDropdownItem city={COMPETE_CITY_1_NAME} project={COMPETE_CITY_1_PROJECT} place={COMPETE_CITY_1_PLACE} align="alignRight" />
+            </Navbar.Text>
+            <Navbar.Text>
+              <NavDropdownItem city={COMPETE_CITY_2_NAME} project={COMPETE_CITY_2_PROJECT} place={COMPETE_CITY_2_PLACE} align="alignRight" />
+            </Navbar.Text>
+            <Navbar.Text>
+              <NavDropdownItem city={COMPETE_CITY_3_NAME} project={COMPETE_CITY_3_PROJECT} place={COMPETE_CITY_3_PLACE} align="alignRight" />
+            </Navbar.Text>
+            <Navbar.Text>
+              <NavDropdownItem city={COMPETE_CITY_4_NAME} project={COMPETE_CITY_4_PROJECT} place={COMPETE_CITY_4_PLACE} align="alignRight" />
+            </Navbar.Text>
+          </Nav>
+        </Navbar.Collapse>
+      </Navbar>
+    );
   }
 }
 
@@ -493,10 +512,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <h1 className="App-title">{HOST_CITY} CNC</h1>
-          <NavBar />
-        </header>
+        <HeaderBar />
         <div className="clear"></div>
         <MainBody />
       </div>
