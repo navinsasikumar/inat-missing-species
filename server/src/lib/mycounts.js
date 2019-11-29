@@ -5,6 +5,10 @@ const myCache = new NodeCache();
 
 let observations = new Observations();
 
+const HOST_PROJECT = process.env.HOST_CITY_PROJECT;
+const HOST_PLACE_ID = process.env.HOST_CITY_PLACE_ID;
+const HOST_PROJECT_PLACE_ID = process.env.HOST_PROJECT_PLACE_ID || process.env.HOST_CITY_PLACE_ID;
+
 Object.defineProperty(Array.prototype, 'flat', {
   value: function(depth = 1) {
     return this.reduce(function (flat, toFlatten) {
@@ -21,14 +25,14 @@ const getAOpts = (query) => {
   if (Object.keys(query).length === 0) {
     console.log('No query keys');
     query.a_months = '4,5';
-    query.b_project_id = 'city-nature-challenge-2019-greater-philadelphia-area';
+    query.b_project_id = HOST_PROJECT;
   }
   if (query.a_place_id) opts.place_id = query.a_place_id;
   if (query.a_project_id) opts.project_id = query.a_project_id;
   if (!query.a_place_id && !query.a_project_id) {
-    opts.place_id = 2983;
+    opts.place_id = HOST_PLACE_ID;
     if (query.b_project_id && query.b_project_id.startsWith('city-nature-challenge')) {
-      opts.place_id = 130542;
+      opts.place_id = HOST_PROJECT_PLACE_ID;
     }
   }
   if (query.a_user_id) opts.user_id = query.a_user_id;
@@ -131,7 +135,7 @@ myCache.on("set", function (key, value) {
 
 myCache.on("expired", function (key, value) {
   console.log('Expiring');
-  if (key === '{"a_months":"4,5","b_project_id":"city-nature-challenge-2019-greater-philadelphia-area"}') {
+  if (key === `{"a_months":"4,5","b_project_id":"${HOST_PROJECT}"}`) {
     console.log('Key is expired');
     cncMissing = missingSpecies(JSON.parse(key));
   }
