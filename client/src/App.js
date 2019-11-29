@@ -7,7 +7,6 @@ import InfiniteScroll from 'react-infinite-scroller';
 import ReactTooltip from 'react-tooltip';
 import {
   Button,
-  ButtonToolbar,
   Navbar,
   Nav,
   NavDropdown,
@@ -65,7 +64,7 @@ class NavDropdownItem extends Component {
 
     return (
       <NavDropdown {...dropdownProps}>
-        <NavDropdown.Item as="button">
+        <NavDropdown.Item as="button" href={`#${this.props.city}`}>
           <span data-effect="solid" data-tip={`Species seen in ${this.props.city}'s CNC project that are missing from ${HOST_CITY}'s CNC Project`}>
             <Link to={`/?a_project_id=${this.props.project}&b_project_id=${HOST_PROJECT}`}>
               Project Comparison
@@ -73,21 +72,21 @@ class NavDropdownItem extends Component {
           </span>
         <ReactTooltip />
         </NavDropdown.Item>
-        <NavDropdown.Item as="button">
+        <NavDropdown.Item as="button" href={`#${this.props.city}`}>
           <span data-effect="solid" data-tip={`Species seen in ${this.props.city} that are missing from ${HOST_CITY}`}>
             <Link to={`/?a_place_id=${this.props.place}&b_place_id=${HOST_PROJECT_PLACE}`}>
               City Comparison
             </Link>
           </span>
         </NavDropdown.Item>
-        <NavDropdown.Item as="button">
+        <NavDropdown.Item as="button" href={`#${this.props.city}`}>
           <span data-effect="solid" data-tip={`Species seen in ${this.props.city} that are missing from ${HOST_CITY}'s CNC Project`}>
             <Link to={`/?a_place_id=${this.props.place}&b_project_id=${HOST_PROJECT}`}>
               Project-City Comparison
             </Link>
           </span>
         </NavDropdown.Item>
-        <NavDropdown.Item as="button">
+        <NavDropdown.Item as="button" href={`#${this.props.city}`}>
           <span data-effect="solid" data-tip={`Species seen in ${this.props.city} in April and May that are missing from ${HOST_CITY}'s CNC Project`}>
             <Link to={`/?a_place_id=${this.props.place}&a_months=4,5&b_project_id=${HOST_PROJECT}`}>
               Project-City Comparison (Apr, May)
@@ -102,14 +101,14 @@ class NavDropdownItem extends Component {
 class HeaderBar extends Component {
   render() {
     return (
-      <Navbar bg="dark" variant="dark" expand="lg">
+      <Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
         <Navbar.Brand href="/">{HOST_CITY} CNC</Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse className="justify-content-end">
+        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+        <Navbar.Collapse className="justify-content-end" id="responsive-navbar-nav">
           <Nav className="justify-content-end">
-            <Navbar.Text>
+            <Nav.Link href="#home"><Navbar.Text>
               <NavDropdownItem city="host" />
-            </Navbar.Text>
+            </Navbar.Text></Nav.Link>
             <Navbar.Text>
               <NavDropdownItem city={COMPETE_CITY_1_NAME} project={COMPETE_CITY_1_PROJECT} place={COMPETE_CITY_1_PLACE} align="alignRight" />
             </Navbar.Text>
