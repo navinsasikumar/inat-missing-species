@@ -236,7 +236,7 @@ class ResultsDisplay extends Component {
                   hasMore={this.state.hasMore}
                   loader={loader}>
           <div className="container">
-            <div className="row grid">{this.state.results}</div>
+            <div className="row grid justify-content-center">{this.state.results}</div>
           </div>
         </InfiniteScroll>
       );
