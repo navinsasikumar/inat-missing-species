@@ -1,33 +1,107 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import InfiniteScroll from 'react-infinite-scroller';
-import ReactTooltip from 'react-tooltip'
-import { Switch, Route, Link } from 'react-router-dom'
-import queryString from 'query-string'
+import ReactTooltip from 'react-tooltip';
+import {
+  Button, ButtonToolbar, DropdownButton, Dropdown,
+} from 'react-bootstrap';
+import { Switch, Route, Link } from 'react-router-dom';
+import queryString from 'query-string';
 import './compiled/App.css';
 
 export const HOST_CITY = process.env.REACT_APP_HOST_CITY_NAME;
 export const HOST_PROJECT = process.env.REACT_APP_HOST_PROJECT;
-export const HOST_CITY_FULL =  process.env.REACT_APP_HOST_CITY_NAME_FULL || process.env.REACT_APP_HOST_CITY_NAME;
-export const HOST_CITY_ID =  process.env.REACT_APP_HOST_CITY_PLACE_ID;
+export const HOST_PROJECT_PLACE = process.env.REACT_APP_HOST_PROJECT_PLACE_ID;
+export const HOST_CITY_FULL = process.env.REACT_APP_HOST_CITY_NAME_FULL || process.env.REACT_APP_HOST_CITY_NAME;
+export const HOST_CITY_ID = process.env.REACT_APP_HOST_CITY_PLACE_ID;
 export const COMPETE_CITY_1_NAME = process.env.REACT_APP_COMPETE_CITY_1_NAME;
 export const COMPETE_CITY_1_PROJECT = process.env.REACT_APP_COMPETE_CITY_1_PROJECT;
+export const COMPETE_CITY_1_PLACE = process.env.REACT_APP_COMPETE_CITY_1_PLACE_ID;
 export const COMPETE_CITY_2_NAME = process.env.REACT_APP_COMPETE_CITY_2_NAME;
 export const COMPETE_CITY_2_PROJECT = process.env.REACT_APP_COMPETE_CITY_2_PROJECT;
+export const COMPETE_CITY_2_PLACE = process.env.REACT_APP_COMPETE_CITY_2_PLACE_ID;
 export const COMPETE_CITY_3_NAME = process.env.REACT_APP_COMPETE_CITY_3_NAME;
 export const COMPETE_CITY_3_PROJECT = process.env.REACT_APP_COMPETE_CITY_3_PROJECT;
+export const COMPETE_CITY_3_PLACE = process.env.REACT_APP_COMPETE_CITY_3_PLACE_ID;
 export const COMPETE_CITY_4_NAME = process.env.REACT_APP_COMPETE_CITY_4_NAME;
 export const COMPETE_CITY_4_PROJECT = process.env.REACT_APP_COMPETE_CITY_4_PROJECT;
+export const COMPETE_CITY_4_PLACE = process.env.REACT_APP_COMPETE_CITY_4_PLACE_ID;
+
+class NavDropdownItem extends Component {
+  static propTypes= {
+    city: PropTypes.string.isRequired,
+    project: PropTypes.string,
+    place: PropTypes.string,
+    align: PropTypes.string,
+  };
+
+  render() {
+    if (this.props.city === 'host') {
+      return (
+        <Button variant="link">
+          <span className="nav-item" data-effect="solid" data-tip={`Species seen in ${HOST_CITY} not yet observed during the CNC`}><Link to={`/?a_months=4,5&b_project_id=${HOST_PROJECT}`}>Home</Link></span><ReactTooltip />
+        </Button>
+      );
+    }
+
+    const dropdownProps = {
+      id: `dropdown-variants-${this.props.city}`,
+      title: this.props.city,
+      key: this.props.city,
+      variant: 'link',
+    };
+    if (this.props.align === 'alignRight') {
+      dropdownProps.alignRight = true;
+    }
+
+    return (
+      <DropdownButton {...dropdownProps}>
+        <Dropdown.Item as="button">
+          <span data-effect="solid" data-tip={`Species seen in ${this.props.city}'s CNC project that are missing from ${HOST_CITY}'s CNC Project`}>
+            <Link to={`/?a_project_id=${this.props.project}&b_project_id=${HOST_PROJECT}`}>
+              Project Comparison
+            </Link>
+          </span>
+        <ReactTooltip />
+        </Dropdown.Item>
+        <Dropdown.Item as="button">
+          <span data-effect="solid" data-tip={`Species seen in ${this.props.city} that are missing from ${HOST_CITY}`}>
+            <Link to={`/?a_place_id=${this.props.place}&b_place_id=${HOST_PROJECT_PLACE}`}>
+              City Comparison
+            </Link>
+          </span>
+        </Dropdown.Item>
+        <Dropdown.Item as="button">
+          <span data-effect="solid" data-tip={`Species seen in ${this.props.city} that are missing from ${HOST_CITY}'s CNC Project`}>
+            <Link to={`/?a_place_id=${this.props.place}&b_project_id=${HOST_PROJECT}`}>
+              Project-City Comparison
+            </Link>
+          </span>
+        </Dropdown.Item>
+        <Dropdown.Item as="button">
+          <span data-effect="solid" data-tip={`Species seen in ${this.props.city} in April and May that are missing from ${HOST_CITY}'s CNC Project`}>
+            <Link to={`/?a_place_id=${this.props.place}&a_months=4,5&b_project_id=${HOST_PROJECT}`}>
+              Project-City Comparison (Apr, May)
+            </Link>
+          </span>
+        </Dropdown.Item>
+      </DropdownButton>
+    );
+  }
+}
 
 class NavBar extends Component {
   render() {
     return (
       <div className="navbar-links">
-        <span className="nav-item" data-effect="solid" data-tip={`Species seen in ${HOST_CITY} not yet observed during the CNC`}><Link to={`/?a_months=4,5&b_project_id=${HOST_PROJECT}`}>Home</Link></span><ReactTooltip />
-        <span className="nav-item" data-effect="solid" data-tip={`Species seen in ${COMPETE_CITY_1_NAME}'s CNC project that is missing from ${HOST_CITY}`}><Link to={`/?a_project_id=${COMPETE_CITY_1_PROJECT}&b_project_id=${HOST_PROJECT}`}>{COMPETE_CITY_1_NAME}</Link></span><ReactTooltip />
-        <span className="nav-item" data-effect="solid" data-tip={`Species seen in ${COMPETE_CITY_2_NAME}'s CNC project that is missing from ${HOST_CITY}`}><Link to={`/?a_project_id=${COMPETE_CITY_2_PROJECT}&b_project_id=${HOST_PROJECT}`}>{COMPETE_CITY_2_NAME}</Link></span><ReactTooltip />
-        <span className="nav-item" data-effect="solid" data-tip={`Species seen in ${COMPETE_CITY_3_NAME}'s CNC project that is missing from ${HOST_CITY}`}><Link to={`/?a_project_id=${COMPETE_CITY_3_PROJECT}&b_project_id=${HOST_PROJECT}`}>{COMPETE_CITY_3_NAME}</Link></span><ReactTooltip />
-        <span className="nav-item" data-effect="solid" data-tip={`Species seen in ${COMPETE_CITY_4_NAME}'s CNC project that is missing from ${HOST_CITY}`}><Link to={`/?a_project_id=${COMPETE_CITY_4_PROJECT}&b_project_id=${HOST_PROJECT}`}>{COMPETE_CITY_4_NAME}</Link></span><ReactTooltip />
+        <ButtonToolbar>
+          <NavDropdownItem city="host" />
+          <NavDropdownItem city={COMPETE_CITY_1_NAME} project={COMPETE_CITY_1_PROJECT} place={COMPETE_CITY_1_PLACE} align="alignRight" />
+          <NavDropdownItem city={COMPETE_CITY_2_NAME} project={COMPETE_CITY_2_PROJECT} place={COMPETE_CITY_2_PLACE} align="alignRight" />
+          <NavDropdownItem city={COMPETE_CITY_3_NAME} project={COMPETE_CITY_3_PROJECT} place={COMPETE_CITY_3_PLACE} align="alignRight" />
+          <NavDropdownItem city={COMPETE_CITY_4_NAME} project={COMPETE_CITY_4_PROJECT} place={COMPETE_CITY_4_PLACE} align="alignRight" />
+        </ButtonToolbar>
       </div>
     )
   }
@@ -59,7 +133,7 @@ class TaxonText extends Component {
       <React.Fragment>
         <div className="taxon-text">
           <div className="taxon-info">
-            <a href={'https://www.inaturalist.org/observations?' + this.props.query + '&subview=grid&view=&taxon_id=' + this.props.taxon.taxon.id + '&page='} target="_blank">
+            <a href={'https://www.inaturalist.org/observations?' + this.props.query + '&subview=grid&view=&taxon_id=' + this.props.taxon.taxon.id + '&page='} target="_blank" rel="noopener noreferrer">
               {this.props.taxon.count} Observations
             </a>
             <div className="copyright-info">
@@ -68,7 +142,7 @@ class TaxonText extends Component {
             </div>
           </div>
           <div className="taxon-names">
-            <a href="">
+            <a href="#test">
               <div className="common-name">
                 {this.props.taxon.taxon.preferred_common_name || this.props.taxon.taxon.name}
               </div>
@@ -98,7 +172,7 @@ class Taxon extends Component {
   render() {
     return (
       <div className="taxon-square">
-        <a href={'https://www.inaturalist.org/taxa/' + this.props.taxon.taxon.id} target="_blank">
+        <a href={'https://www.inaturalist.org/taxa/' + this.props.taxon.taxon.id} target="_blank" rel="noopener noreferrer">
           <TaxonImage img={this.props.taxon.taxon.default_photo} alt={this.props.taxon.taxon.name}/>
         </a>
         <TaxonText taxon={this.props.taxon} query={this.props.query}/>
