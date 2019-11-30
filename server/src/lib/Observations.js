@@ -1,14 +1,22 @@
 const helper = require('./Helper');
 
-function Observations() {
-  this.url = 'http://api.inaturalist.org/v1/observations';
-}
+class Observations {
+  constructor(perPage) {
+    this.url = 'http://api.inaturalist.org/v1/observations';
+    this.perPage = perPage || 50;
+  }
 
-Observations.prototype.speciesCounts = async function(opts) {
-  let queryStr = helper.makeQueryStr(opts);
-  let url = this.url + '/species_counts' + queryStr;
-  let response = await helper.request(url);
-  return response;
-};
+  async speciesCounts(opts) {
+    const queryStr = helper.makeQueryStr(opts);
+    const url = `${this.url}/species_counts/${queryStr}`;
+    return helper.request(url);
+  }
+
+  async get(opts) {
+    const queryStr = helper.makeQueryStr(opts);
+    const url = `${this.url}/${queryStr}`;
+    return helper.request(url);
+  }
+}
 
 module.exports = Observations;

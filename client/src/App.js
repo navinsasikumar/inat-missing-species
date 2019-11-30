@@ -1,3 +1,5 @@
+/* eslint-disable class-methods-use-this */
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 
@@ -6,7 +8,6 @@ import PropTypes from 'prop-types';
 import InfiniteScroll from 'react-infinite-scroller';
 import ReactTooltip from 'react-tooltip';
 import {
-  Button,
   Navbar,
   Nav,
   NavDropdown,
@@ -14,6 +15,7 @@ import {
 import { Switch, Route, Link } from 'react-router-dom';
 import queryString from 'query-string';
 import Loader from 'react-loader-spinner';
+import SearchDisplay from './components/SearchDisplay';
 import './compiled/App.css';
 
 export const HOST_CITY = process.env.REACT_APP_HOST_CITY_NAME;
@@ -47,6 +49,12 @@ class NavDropdownItem extends Component {
       return (
         <span>
           <span className="nav-item" data-effect="solid" data-tip={`Species seen in ${HOST_CITY} not yet observed during the CNC`}><Link to={`/?a_months=4,5&b_project_id=${HOST_PROJECT}`}>Home</Link></span><ReactTooltip />
+        </span>
+      );
+    } else if (this.props.city === 'search') {
+      return (
+        <span>
+          <span className="nav-item" data-effect="solid" data-tip={`Search Observations`}><Link to={`/search`}>Search</Link></span><ReactTooltip />
         </span>
       );
     }
@@ -121,6 +129,9 @@ class HeaderBar extends Component {
             <Navbar.Text>
               <NavDropdownItem city={COMPETE_CITY_4_NAME} project={COMPETE_CITY_4_PROJECT} place={COMPETE_CITY_4_PLACE} align="alignRight" />
             </Navbar.Text>
+            <Navbar.Text><Nav.Link href="#search">
+              <NavDropdownItem city="search" />
+            </Nav.Link></Navbar.Text>
           </Nav>
         </Navbar.Collapse>
       </Navbar>
@@ -365,6 +376,7 @@ class Display extends Component {
     const queryStr = location.search;
     const username = params.username;
     const place = params.place;
+    console.log(location);
     let newQueryStr = '';
     if (username && place) {
       newQueryStr = 'b_user_id=' + username;
@@ -513,7 +525,10 @@ class App extends Component {
       <div className="App">
         <HeaderBar />
         <div className="clear"></div>
-        <MainBody />
+        <Switch>
+          <Route path='/search' component={SearchDisplay}/>
+          <Route path='/' component={MainBody}/>
+        </Switch>
       </div>
     );
   }

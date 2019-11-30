@@ -11,6 +11,11 @@ const HOST = '0.0.0.0';
 
 const CLIENT_BUILD_PATH = path.join(__dirname, '../../client/build');
 
+const setAPIHeaders = (req, res, next) => {
+  res.set('Content-Type', 'application/json');
+  return next();
+};
+
 // App
 const app = express();
 
@@ -26,7 +31,10 @@ app.get('/api', (req, res) => {
   res.send(JSON.stringify(data, null, 2));
 });
 
+app.use('/api', setAPIHeaders);
+app.get('/api/observations', inatRoutes.getObservations);
 app.get('/api/observations/species', inatRoutes.speciesCounts);
+app.get('/api/taxa/autocomplete', inatRoutes.autocompleteTaxa);
 
 // All remaining requests return the React app, so it can handle routing.
 app.get('*', function(request, response) {
