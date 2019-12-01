@@ -52,7 +52,7 @@ class SearchDisplay extends Component {
     const url = `/api/taxa/autocomplete?search=${searchStr}`;
     this.callApi(url)
       .then(res => this.setState({ speciesMatch: res }))
-      .catch(console.error);
+      .catch(e => this.setState({ errors: e }));
   }
 
   handleSpeciesSelect(selectedSpecies) {

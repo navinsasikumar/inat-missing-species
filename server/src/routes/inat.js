@@ -20,7 +20,7 @@ const getObservations = async (req, res) => {
   console.log('Getting Observations');
   const observations = new Observations();
   const results = await observations.get(req.query);
-  console.log(results);
+  console.log(JSON.stringify(results.results[1]));
   return res.send(results);
 };
 

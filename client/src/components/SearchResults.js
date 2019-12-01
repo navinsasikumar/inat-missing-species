@@ -4,10 +4,17 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
+import {
+  Container,
+  Row,
+} from 'react-bootstrap';
+import ObservationSquare from './ObservationSquare';
 
 const SearchResultsWrapper = styled.div`
   color: white;
 `;
+
+const ColOverride = styled.div``;
 
 class SearchResults extends Component {
   static propTypes= {
@@ -17,9 +24,15 @@ class SearchResults extends Component {
   render() {
     return (
       <SearchResultsWrapper>
-        {this.props.results.map(obs => (
-          <div key={obs.id}>{obs.taxon && obs.taxon.preferred_common_name}</div>
-        ))}
+        <Container>
+          <Row className="grid justify-content-center">
+            {this.props.results.map(obs => (
+              <ColOverride xs={true} key={obs.id} className="no-padding">
+                <ObservationSquare observation={obs} />
+              </ColOverride>
+            ))}
+          </Row>
+        </Container>
       </SearchResultsWrapper>
     );
   }
