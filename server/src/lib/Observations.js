@@ -15,6 +15,7 @@ class Observations {
   async get(opts) {
     const queryStr = helper.makeQueryStr(opts);
     const url = `${this.url}/${queryStr}`;
+    console.log(url);
     return helper.request(url);
   }
 }

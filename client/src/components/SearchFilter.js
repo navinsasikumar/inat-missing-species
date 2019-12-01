@@ -8,34 +8,57 @@ import PropTypes from 'prop-types';
 import AutoComplete from './AutoComplete';
 import SelectedFilters from './SelectedFilters';
 
-const MultiSelected = styled.div`
+const SearchFilterWrapper = styled.div`
+  padding: 10px;
   text-align: left;
+`;
+
+const MultiSelected = styled.div`
   color: white;
+  display: inline-block;
   font-size: 65%;
+  padding-right: 20px;
 `;
 
 class SearchFilter extends Component {
   static propTypes= {
-    handleSpeciesSelect: PropTypes.func.isRequired,
+    excludedSpecies: PropTypes.array.isRequired,
     handleSpeciesChange: PropTypes.func.isRequired,
     handleSelectedClick: PropTypes.func.isRequired,
+    handleSpeciesSelect: PropTypes.func.isRequired,
+    speciesMatch: PropTypes.array.isRequired,
     selectedSpecies: PropTypes.array.isRequired,
     speciesValue: PropTypes.string,
-    speciesMatch: PropTypes.array.isRequired,
   };
 
   render() {
+    const selectedSpeciesLabel = this.props.selectedSpecies.length > 0 ? 'Selected Taxa: ' : '';
+    const excludedSpeciesLabel = this.props.excludedSpecies.length > 0 ? 'Excluded Taxa: ' : '';
+
     return (
-      <div className="SearchFilter">
+      <SearchFilterWrapper>
         <Form>
           <Form.Control size="md" type="text" placeholder="Species" onChange={this.props.handleSpeciesChange} value={this.props.speciesValue} />
           <MultiSelected>
+            {selectedSpeciesLabel}
             {this.props.selectedSpecies.map((species, index) => (
               <SelectedFilters
                 key={species.id}
+                selectedIndex={index}
                 selectedValue={species}
                 selectedType="species"
+                handleSelectedClick={this.props.handleSelectedClick}
+              />
+            ))}
+          </MultiSelected>
+          <MultiSelected>
+            {excludedSpeciesLabel}
+            {this.props.excludedSpecies.map((species, index) => (
+              <SelectedFilters
+                key={species.id}
                 selectedIndex={index}
+                selectedValue={species}
+                selectedType="speciesExclude"
                 handleSelectedClick={this.props.handleSelectedClick}
               />
             ))}
@@ -43,7 +66,7 @@ class SearchFilter extends Component {
           <Form.Control size="md" type="text" placeholder="Location" />
         </Form>
         <AutoComplete type="species" matches={this.props.speciesMatch} handleSpeciesSelect={this.props.handleSpeciesSelect}/>
-      </div>
+      </SearchFilterWrapper>
     );
   }
 }

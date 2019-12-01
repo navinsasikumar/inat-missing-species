@@ -33,6 +33,7 @@ class SearchDisplay extends Component {
       page: 1,
       errors: '',
       selectedSpecies: [],
+      excludedSpecies: [],
       speciesInputValue: '',
       speciesMatch: [],
     };
@@ -48,19 +49,25 @@ class SearchDisplay extends Component {
       && array1.every((value, index) => value === array2[index]);
   }
 
+  makeTaxonObj = taxon => (
+    {
+      id: taxon.id,
+      name: taxon.name,
+      common: taxon.preferred_common_name,
+    }
+  )
+
   splitQueryStr = async (queryStr) => {
     const query = queryString.parse(queryStr);
     // console.log(query);
     const newState = {};
     if (query.taxon_ids) {
       const getTaxaRes = await this.callApi(`/api/taxa/${query.taxon_ids}`);
-      newState.selectedSpecies = getTaxaRes.results.map(taxon => (
-        {
-          id: taxon.id,
-          name: taxon.name,
-          common: taxon.preferred_common_name,
-        }
-      ));
+      newState.selectedSpecies = getTaxaRes.results.map(this.makeTaxonObj);
+    }
+    if (query.without_taxon_id) {
+      const getTaxaRes = await this.callApi(`/api/taxa/${query.without_taxon_id}`);
+      newState.excludedSpecies = getTaxaRes.results.map(this.makeTaxonObj);
     }
     if (query.page) {
       newState.page = Number(query.page);
@@ -105,12 +112,20 @@ class SearchDisplay extends Component {
       .catch(e => this.setState({ errors: e }));
   }
 
-  handleSpeciesSelect(selectedSpecies) {
-    this.setState(prevState => ({
-      selectedSpecies: [...prevState.selectedSpecies, selectedSpecies],
-      speciesInputValue: '',
-      speciesMatch: [],
-    }));
+  handleSpeciesSelect(selectedSpecies, exclude = false) {
+    if (exclude === false) {
+      this.setState(prevState => ({
+        selectedSpecies: [...prevState.selectedSpecies, selectedSpecies],
+        speciesInputValue: '',
+        speciesMatch: [],
+      }));
+    } else {
+      this.setState(prevState => ({
+        excludedSpecies: [...prevState.excludedSpecies, selectedSpecies],
+        speciesInputValue: '',
+        speciesMatch: [],
+      }));
+    }
   }
 
   handleSelectedClick(index, type) {
@@ -119,6 +134,12 @@ class SearchDisplay extends Component {
         const selectedSpecies = [...this.state.selectedSpecies];
         selectedSpecies.splice(index, 1);
         this.setState({ selectedSpecies });
+        break;
+      }
+      case 'speciesExclude': {
+        const excludedSpecies = [...this.state.excludedSpecies];
+        excludedSpecies.splice(index, 1);
+        this.setState({ excludedSpecies });
         break;
       }
       case 'place':
@@ -138,13 +159,29 @@ class SearchDisplay extends Component {
     this.setState({ page });
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  shouldUpdate = (prevProps, prevState) => {
     const prevTaxonIds = prevState.selectedSpecies.map(taxon => taxon.id);
     const currTaxonIds = this.state.selectedSpecies.map(taxon => taxon.id);
-    if (!this.isEqualArrays(prevTaxonIds, currTaxonIds) || prevState.page !== this.state.page) {
+
+    const prevExcludedTaxonIds = prevState.excludedSpecies.map(taxon => taxon.id);
+    const currExcludedTaxonIds = this.state.excludedSpecies.map(taxon => taxon.id);
+
+    return !this.isEqualArrays(prevTaxonIds, currTaxonIds)
+      || !this.isEqualArrays(prevExcludedTaxonIds, currExcludedTaxonIds)
+      || prevState.page !== this.state.page;
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.shouldUpdate(prevProps, prevState)) {
+      const currTaxonIds = this.state.selectedSpecies.map(taxon => taxon.id);
+      const currExcludedTaxonIds = this.state.excludedSpecies.map(taxon => taxon.id);
+
       const queryObj = {};
+
       if (currTaxonIds.length > 0) queryObj.taxon_ids = currTaxonIds.join(',');
+      if (currExcludedTaxonIds.length > 0) queryObj.without_taxon_id = currExcludedTaxonIds.join(',');
       if (this.state.page !== 1) queryObj.page = this.state.page;
+
       const queryStr = queryString.stringify(queryObj);
       const url = queryStr ? `/api/observations?${queryStr}` : '/api/observations';
 
@@ -181,6 +218,7 @@ class SearchDisplay extends Component {
           handleSpeciesSelect={this.handleSpeciesSelect}
           handleSelectedClick={this.handleSelectedClick}
           selectedSpecies={this.state.selectedSpecies}
+          excludedSpecies={this.state.excludedSpecies}
           speciesValue={this.state.speciesInputValue}
           speciesMatch={this.state.speciesMatch}
         />
