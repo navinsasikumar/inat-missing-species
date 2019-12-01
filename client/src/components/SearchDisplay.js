@@ -21,6 +21,7 @@ class SearchDisplay extends Component {
     this.setObservationResults = this.setObservationResults.bind(this);
     this.handleSpeciesChange = this.handleSpeciesChange.bind(this);
     this.handleSpeciesSelect = this.handleSpeciesSelect.bind(this);
+    this.handleSelectedClick = this.handleSelectedClick.bind(this);
     this.handlePageClick = this.handlePageClick.bind(this);
 
     this.state = {
@@ -62,7 +63,7 @@ class SearchDisplay extends Component {
       ));
     }
     if (query.page) {
-      newState.page = query.page;
+      newState.page = Number(query.page);
     }
     this.setState(newState);
   }
@@ -110,6 +111,21 @@ class SearchDisplay extends Component {
       speciesInputValue: '',
       speciesMatch: [],
     }));
+  }
+
+  handleSelectedClick(index, type) {
+    switch (type) {
+      case 'species': {
+        const selectedSpecies = [...this.state.selectedSpecies];
+        selectedSpecies.splice(index, 1);
+        this.setState({ selectedSpecies });
+        break;
+      }
+      case 'place':
+      case 'user':
+        break;
+      default:
+    }
   }
 
   handlePageClick = (data) => {
@@ -163,6 +179,7 @@ class SearchDisplay extends Component {
         <SearchFilter
           handleSpeciesChange={this.handleSpeciesChange}
           handleSpeciesSelect={this.handleSpeciesSelect}
+          handleSelectedClick={this.handleSelectedClick}
           selectedSpecies={this.state.selectedSpecies}
           speciesValue={this.state.speciesInputValue}
           speciesMatch={this.state.speciesMatch}
