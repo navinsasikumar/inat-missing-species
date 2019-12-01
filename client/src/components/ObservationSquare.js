@@ -5,6 +5,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import ObservationImage from './ObservationImage';
+import ObservationCaption from './ObservationCaption';
 
 const ObservationWrapper = styled.div`
   background-color: #17181C;
@@ -12,6 +13,9 @@ const ObservationWrapper = styled.div`
   position: relative;
   clear: both;
   width: 165px;
+  a {
+    color: white;
+  }
   @media (min-width: 768px) {
     width: 210px;
   }
@@ -25,8 +29,10 @@ class ObservationSquare extends Component {
   render() {
     return (
      <ObservationWrapper>
-       <ObservationImage photos={this.props.observation.photos} />
-       {this.props.observation.taxon ? this.props.observation.taxon.preferred_common_name : 'Unknown'}
+       <a href={this.props.observation.uri} target="_blank" rel="noopener noreferrer">
+         <ObservationImage photos={this.props.observation.photos} />
+         <ObservationCaption observation={this.props.observation} />
+       </a>
      </ObservationWrapper>
     );
   }

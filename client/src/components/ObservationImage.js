@@ -20,7 +20,7 @@ class ObservationImage extends Component {
 
   render() {
     let dispPhoto = this.props.photos.length > 0 ? this.props.photos[0].url : '';
-    dispPhoto = dispPhoto.replace(/square.jpg/, 'medium.jpg');
+    dispPhoto = dispPhoto.replace(/square/, 'medium');
 
     if (dispPhoto) {
       return (

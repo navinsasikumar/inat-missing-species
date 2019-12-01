@@ -73,9 +73,11 @@ class SearchDisplay extends Component {
     const currTaxonIds = this.state.selectedSpecies.map(taxon => taxon.id);
     if (!this.isEqualArrays(prevTaxonIds, currTaxonIds)) {
       const url = `/api/observations?taxon_ids=${currTaxonIds.join(',')}`;
+      this.setState({ loading: true });
       this.callApi(url)
         .then(res => this.setState({ results: res, loading: false }))
-        .catch(e => this.setState({ errors: e }));
+        .catch(e => this.setState({ errors: e }))
+        .finally(() => this.setState({ loading: false }));
     }
   }
 
@@ -83,7 +85,8 @@ class SearchDisplay extends Component {
     this.setState({ loading: true });
     this.callApi()
       .then(res => this.setState({ results: res, loading: false }))
-      .catch(e => this.setState({ errors: e }));
+      .catch(e => this.setState({ errors: e }))
+      .finally(() => this.setState({ loading: false }));
   }
 
   render() {
