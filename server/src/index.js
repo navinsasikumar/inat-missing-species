@@ -35,6 +35,7 @@ app.use('/api', setAPIHeaders);
 app.get('/api/observations', inatRoutes.getObservations);
 app.get('/api/observations/species', inatRoutes.speciesCounts);
 app.get('/api/taxa/autocomplete', inatRoutes.autocompleteTaxa);
+app.get('/api/taxa/:ids', inatRoutes.getTaxa);
 
 // All remaining requests return the React app, so it can handle routing.
 app.get('*', function(request, response) {

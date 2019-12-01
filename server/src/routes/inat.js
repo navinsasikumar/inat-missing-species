@@ -8,6 +8,19 @@ const speciesCounts = async (req, res) => {
   return res.send(diff);
 };
 
+const getTaxa = async (req, res) => {
+  try {
+    console.log('Calling get Taxa');
+    const taxa = new Taxa();
+    const results = await taxa.get(req.params.ids);
+    console.log(results);
+    return res.send(results);
+  } catch (e) {
+    console.error(e);
+    res.send({ results: [] });
+  }
+};
+
 const autocompleteTaxa = async (req, res) => {
   console.log('Calling autocomplete');
   const taxa = new Taxa(10);
@@ -26,6 +39,7 @@ const getObservations = async (req, res) => {
 
 module.exports = {
   speciesCounts,
+  getTaxa,
   autocompleteTaxa,
   getObservations,
 };

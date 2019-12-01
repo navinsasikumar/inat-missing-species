@@ -10,6 +10,11 @@ class Taxa {
     const url = `${this.url}/autocomplete?q=${query}`;
     return helper.request(url);
   }
+
+  async get(ids) {
+    const url = `${this.url}/${ids}`;
+    return helper.request(url);
+  }
 }
 
 module.exports = Taxa;

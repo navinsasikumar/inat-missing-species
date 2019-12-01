@@ -3,9 +3,10 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
+import queryString from 'query-string';
 import SearchFilter from './SearchFilter';
 import SearchResults from './SearchResults';
-// import PropTypes from 'prop-types';
 
 const SearchDisplayWrapper = styled.div``;
 
@@ -16,10 +17,12 @@ class SearchDisplay extends Component {
 
     this.callApi = this.callApi.bind(this);
     this.isEqualArrays = this.isEqualArrays.bind(this);
+    this.splitQueryStr = this.splitQueryStr.bind(this);
     this.handleSpeciesChange = this.handleSpeciesChange.bind(this);
     this.handleSpeciesSelect = this.handleSpeciesSelect.bind(this);
 
     this.state = {
+      queryStr: '',
       results: [],
       loading: false,
       errors: '',
@@ -29,7 +32,35 @@ class SearchDisplay extends Component {
     };
   }
 
+  static propTypes= {
+    history: PropTypes.object.isRequired,
+    location: PropTypes.object,
+  };
+
+  isEqualArrays(array1, array2) {
+    return array1.length === array2.length
+      && array1.every((value, index) => value === array2[index]);
+  }
+
+  splitQueryStr = async (queryStr) => {
+    const query = queryString.parse(queryStr);
+    // console.log(query);
+    let selectedSpecies;
+    if (query.taxon_ids) {
+      const getTaxaRes = await this.callApi(`/api/taxa/${query.taxon_ids}`);
+      selectedSpecies = getTaxaRes.map(taxon => (
+        {
+          id: taxon.id,
+          name: taxon.name,
+          common: taxon.preferred_common_name,
+        }
+      ));
+    }
+    this.setState({ selectedSpecies });
+  }
+
   callApi = async (url = '/api/observations') => {
+    // console.log(`Querying: ${url}`);
     const resp = await fetch(url);
     const text = await resp.text();
     let data;
@@ -63,17 +94,17 @@ class SearchDisplay extends Component {
     }));
   }
 
-  isEqualArrays(array1, array2) {
-    return array1.length === array2.length
-      && array1.every((value, index) => value === array2[index]);
-  }
-
   componentDidUpdate(prevProps, prevState) {
     const prevTaxonIds = prevState.selectedSpecies.map(taxon => taxon.id);
     const currTaxonIds = this.state.selectedSpecies.map(taxon => taxon.id);
     if (!this.isEqualArrays(prevTaxonIds, currTaxonIds)) {
-      const url = `/api/observations?taxon_ids=${currTaxonIds.join(',')}`;
-      this.setState({ loading: true });
+      const queryStr = `taxon_ids=${currTaxonIds.join(',')}`;
+      const url = `/api/observations?${queryStr}`;
+
+      this.setState({ loading: true, queryStr }, () => {
+        this.props.history.push(`/search?${this.state.queryStr}`);
+      });
+
       this.callApi(url)
         .then(res => this.setState({ results: res, loading: false }))
         .catch(e => this.setState({ errors: e }))
@@ -82,11 +113,17 @@ class SearchDisplay extends Component {
   }
 
   componentDidMount() {
-    this.setState({ loading: true });
-    this.callApi()
-      .then(res => this.setState({ results: res, loading: false }))
-      .catch(e => this.setState({ errors: e }))
-      .finally(() => this.setState({ loading: false }));
+    const queryStr = this.props.location.search;
+    if (queryStr) {
+      this.splitQueryStr(queryStr);
+    } else {
+      this.setState({ loading: true });
+      this.callApi()
+        .then(res => this.setState({ results: res, loading: false }))
+        .catch(e => this.setState({ errors: e }))
+        .finally(() => this.setState({ loading: false }));
+    }
+    // const url = `/api/observations${queryStr}`;
   }
 
   render() {
