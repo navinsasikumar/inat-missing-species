@@ -17,8 +17,20 @@ class TaxonName extends Component {
   };
 
   render() {
-    const commonName = this.props.observation.taxon ? this.props.observation.taxon.preferred_common_name : 'Unknown';
-    const latinName = this.props.observation.taxon ? `(${this.props.observation.taxon.name})` : '';
+    const { taxon } = this.props.observation;
+    let commonName;
+    let latinName;
+    if (taxon) {
+      latinName = taxon.name;
+      if (taxon.preferred_common_name) {
+        commonName = taxon.preferred_common_name;
+      } else {
+        commonName = taxon.name;
+      }
+    } else {
+      commonName = 'Unknown';
+      latinName = '';
+    }
 
     return (
       <TaxonNameWrapper>
