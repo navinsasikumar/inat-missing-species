@@ -10,12 +10,17 @@ import {
 } from 'react-bootstrap';
 
 const AutoCompleteUL = styled.ul`
+  background-color: #1B1D22;
   color: white;
   cursor: pointer;
   font-size: 65%;
   list-style-type: none;
   padding-left: 0;
+  padding-top: 5px;
+  position: absolute;
   text-align: left;
+  width: 400px;
+  z-index: 1000;
 `;
 
 const SpeciesItem = styled.div`
@@ -25,6 +30,7 @@ const SpeciesItem = styled.div`
 
 const IncludeSpeciesItem = styled.div`
   display: inline-block;
+  width: 100%;
   :hover {
     color: grey;
   }
@@ -40,6 +46,7 @@ const ExcludeSpeciesItem = styled.div`
 const PhotoDiv = styled.div`
   display: inline-block;
   vertical-align: middle;
+  width: 40px;
 `;
 
 const PhotoImg = styled.img`
@@ -88,34 +95,43 @@ class AutoComplete extends Component {
   }
 
   render() {
-    const speciesList = this.props.matches.map(species => (
-      <li key={species.id} data-id={species.id}>
-          <SpeciesItem>
-            <Row>
-              <Col xs={8} className="trimText">
-                <IncludeSpeciesItem onClick={() => this.handleSpeciesSelect(species, false)}>
-                  <PhotoDiv>
-                    <PhotoImg
-                      src={species.default_photo && species.default_photo.square_url}
-                      alt={species.name}
-                    />
-                  </PhotoDiv>
-                  <Names>
-                    <CommonName>{species.preferred_common_name}</CommonName>
-                    <Latin>
-                      <Rank>{species.rank === 'species' ? '' : `${species.rank}\u00a0`}</Rank><LatinName>{species.name}</LatinName></Latin>
-                  </Names>
-                </IncludeSpeciesItem>
-              </Col>
-              <Col xs={4}>
-                <ExcludeSpeciesItem onClick={() => this.handleSpeciesSelect(species, true)}>
-                  Exclude
-                </ExcludeSpeciesItem>
-              </Col>
-            </Row>
-          </SpeciesItem>
-      </li>
-    ));
+    const speciesList = this.props.matches.map((species) => {
+      let photoElem;
+      if (species.default_photo && species.default_photo.square_url) {
+        photoElem = <PhotoImg
+          src={species.default_photo.square_url}
+          alt={species.name}
+        />;
+      } else {
+        photoElem = '';
+      }
+
+      return (
+        <li key={species.id} data-id={species.id}>
+            <SpeciesItem>
+              <Row>
+                <Col xs={9} className="trimText">
+                  <IncludeSpeciesItem onClick={() => this.handleSpeciesSelect(species, false)}>
+                    <PhotoDiv>
+                      {photoElem}
+                    </PhotoDiv>
+                    <Names>
+                      <CommonName>{species.preferred_common_name}</CommonName>
+                      <Latin>
+                        <Rank>{species.rank === 'species' ? '' : `${species.rank}\u00a0`}</Rank><LatinName>{species.name}</LatinName></Latin>
+                    </Names>
+                  </IncludeSpeciesItem>
+                </Col>
+                <Col xs={3} className="autocomplete-exclude-species">
+                  <ExcludeSpeciesItem onClick={() => this.handleSpeciesSelect(species, true)}>
+                    Exclude
+                  </ExcludeSpeciesItem>
+                </Col>
+              </Row>
+            </SpeciesItem>
+        </li>
+      );
+    });
 
     return (
       <div>

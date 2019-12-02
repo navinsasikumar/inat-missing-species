@@ -13,6 +13,10 @@ const SearchFilterWrapper = styled.div`
   text-align: left;
 `;
 
+const FormGroup = styled.div`
+  position: relative;
+`;
+
 const MultiSelected = styled.div`
   color: white;
   display: inline-block;
@@ -38,34 +42,36 @@ class SearchFilter extends Component {
     return (
       <SearchFilterWrapper>
         <Form>
-          <Form.Control size="md" type="text" placeholder="Species" onChange={this.props.handleSpeciesChange} value={this.props.speciesValue} />
-          <MultiSelected>
-            {selectedSpeciesLabel}
-            {this.props.selectedSpecies.map((species, index) => (
-              <SelectedFilters
-                key={species.id}
-                selectedIndex={index}
-                selectedValue={species}
-                selectedType="species"
-                handleSelectedClick={this.props.handleSelectedClick}
-              />
-            ))}
-          </MultiSelected>
-          <MultiSelected>
-            {excludedSpeciesLabel}
-            {this.props.excludedSpecies.map((species, index) => (
-              <SelectedFilters
-                key={species.id}
-                selectedIndex={index}
-                selectedValue={species}
-                selectedType="speciesExclude"
-                handleSelectedClick={this.props.handleSelectedClick}
-              />
-            ))}
-          </MultiSelected>
+          <FormGroup>
+            <Form.Control size="md" type="text" placeholder="Species" onChange={this.props.handleSpeciesChange} value={this.props.speciesValue} />
+            <AutoComplete type="species" matches={this.props.speciesMatch} handleSpeciesSelect={this.props.handleSpeciesSelect}/>
+            <MultiSelected>
+              {selectedSpeciesLabel}
+              {this.props.selectedSpecies.map((species, index) => (
+                <SelectedFilters
+                  key={species.id}
+                  selectedIndex={index}
+                  selectedValue={species}
+                  selectedType="species"
+                  handleSelectedClick={this.props.handleSelectedClick}
+                />
+              ))}
+            </MultiSelected>
+            <MultiSelected>
+              {excludedSpeciesLabel}
+              {this.props.excludedSpecies.map((species, index) => (
+                <SelectedFilters
+                  key={species.id}
+                  selectedIndex={index}
+                  selectedValue={species}
+                  selectedType="speciesExclude"
+                  handleSelectedClick={this.props.handleSelectedClick}
+                />
+              ))}
+            </MultiSelected>
+          </FormGroup>
           <Form.Control size="md" type="text" placeholder="Location" />
         </Form>
-        <AutoComplete type="species" matches={this.props.speciesMatch} handleSpeciesSelect={this.props.handleSpeciesSelect}/>
       </SearchFilterWrapper>
     );
   }

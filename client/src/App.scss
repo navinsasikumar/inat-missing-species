@@ -190,6 +190,12 @@ img {
     text-overflow: ellipsis
 }
 
+.autocomplete-exclude-species {
+  border-left: solid 1px gray;
+  line-height: 40px;
+  margin: auto;
+}
+
 @media (min-width: 768px) {
   .crop {
     height: 210px;
