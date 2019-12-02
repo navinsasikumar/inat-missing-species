@@ -184,6 +184,12 @@ img {
   padding-right: 0;
 }
 
+.trimText{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis
+}
+
 @media (min-width: 768px) {
   .crop {
     height: 210px;

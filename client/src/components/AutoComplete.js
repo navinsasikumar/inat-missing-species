@@ -4,18 +4,34 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import {
+  Col,
+  Row,
+} from 'react-bootstrap';
 
 const AutoCompleteUL = styled.ul`
-  cursor: pointer;
-  list-style-type: none;
   color: white;
+  cursor: pointer;
   font-size: 65%;
+  list-style-type: none;
+  padding-left: 0;
   text-align: left;
 `;
 
 const SpeciesItem = styled.div`
   border: solid 1px #333;
   padding: 1px;
+`;
+
+const IncludeSpeciesItem = styled.div`
+  display: inline-block;
+  :hover {
+    color: grey;
+  }
+`;
+
+const ExcludeSpeciesItem = styled.div`
+  display: inline-block;
   :hover {
     color: grey;
   }
@@ -62,28 +78,42 @@ class AutoComplete extends Component {
     handleSpeciesSelect: PropTypes.func.isRequired,
   };
 
-  handleSpeciesSelect = (species) => {
+  handleSpeciesSelect = (species, exclude) => {
     const selectedSpecies = {
       id: species.id,
       name: species.name,
       common: species.preferred_common_name,
     };
-    this.props.handleSpeciesSelect(selectedSpecies);
+    this.props.handleSpeciesSelect(selectedSpecies, exclude);
   }
 
   render() {
     const speciesList = this.props.matches.map(species => (
-      <li key={species.id} onClick={() => this.handleSpeciesSelect(species)} data-id={species.id}>
-        <SpeciesItem>
-          <PhotoDiv>
-            <PhotoImg src={species.default_photo && species.default_photo.square_url} alt={species.name}/>
-          </PhotoDiv>
-          <Names>
-            <CommonName>{species.preferred_common_name}</CommonName>
-            <Latin>
-              <Rank>{species.rank === 'species' ? '' : `${species.rank}\u00a0`}</Rank><LatinName>{species.name}</LatinName></Latin>
-          </Names>
-        </SpeciesItem>
+      <li key={species.id} data-id={species.id}>
+          <SpeciesItem>
+            <Row>
+              <Col xs={8} className="trimText">
+                <IncludeSpeciesItem onClick={() => this.handleSpeciesSelect(species, false)}>
+                  <PhotoDiv>
+                    <PhotoImg
+                      src={species.default_photo && species.default_photo.square_url}
+                      alt={species.name}
+                    />
+                  </PhotoDiv>
+                  <Names>
+                    <CommonName>{species.preferred_common_name}</CommonName>
+                    <Latin>
+                      <Rank>{species.rank === 'species' ? '' : `${species.rank}\u00a0`}</Rank><LatinName>{species.name}</LatinName></Latin>
+                  </Names>
+                </IncludeSpeciesItem>
+              </Col>
+              <Col xs={4}>
+                <ExcludeSpeciesItem onClick={() => this.handleSpeciesSelect(species, true)}>
+                  Exclude
+                </ExcludeSpeciesItem>
+              </Col>
+            </Row>
+          </SpeciesItem>
       </li>
     ));
 
