@@ -19,8 +19,13 @@ class SearchDisplay extends Component {
     this.isEqualArrays = this.isEqualArrays.bind(this);
     this.splitQueryStr = this.splitQueryStr.bind(this);
     this.setObservationResults = this.setObservationResults.bind(this);
+
     this.handleSpeciesChange = this.handleSpeciesChange.bind(this);
     this.handleSpeciesSelect = this.handleSpeciesSelect.bind(this);
+
+    this.handlePlacesChange = this.handlePlacesChange.bind(this);
+    this.handlePlacesSelect = this.handlePlacesSelect.bind(this);
+
     this.handleSelectedClick = this.handleSelectedClick.bind(this);
     this.handlePageClick = this.handlePageClick.bind(this);
 
@@ -36,6 +41,10 @@ class SearchDisplay extends Component {
       excludedSpecies: [],
       speciesInputValue: '',
       speciesMatch: [],
+      selectedPlaces: [],
+      excludedPlaces: [],
+      placesInputValue: '',
+      placesMatch: [],
     };
   }
 
@@ -57,10 +66,19 @@ class SearchDisplay extends Component {
     }
   )
 
+  makePlaceObj = place => (
+    {
+      id: place.id,
+      name: place.name,
+      display: place.display_name,
+    }
+  )
+
   splitQueryStr = async (queryStr) => {
     const query = queryString.parse(queryStr);
     // console.log(query);
     const newState = {};
+
     if (query.taxon_ids) {
       const getTaxaRes = await this.callApi(`/api/taxa/${query.taxon_ids}`);
       newState.selectedSpecies = getTaxaRes.results.map(this.makeTaxonObj);
@@ -69,6 +87,16 @@ class SearchDisplay extends Component {
       const getTaxaRes = await this.callApi(`/api/taxa/${query.without_taxon_id}`);
       newState.excludedSpecies = getTaxaRes.results.map(this.makeTaxonObj);
     }
+
+    if (query.place_id) {
+      const getPlacesRes = await this.callApi(`/api/places/${query.place_id}`);
+      newState.selectedPlaces = getPlacesRes.results.map(this.makePlaceObj);
+    }
+    if (query.not_in_place) {
+      const getPlacesRes = await this.callApi(`/api/places/${query.not_in_place}`);
+      newState.excludedPlaces = getPlacesRes.results.map(this.makePlaceObj);
+    }
+
     if (query.page) {
       newState.page = Number(query.page);
     }
@@ -128,6 +156,32 @@ class SearchDisplay extends Component {
     }
   }
 
+
+  handlePlacesChange(event) {
+    const searchStr = event.target.value;
+    this.setState({ placesInputValue: searchStr });
+    const url = `/api/places/autocomplete?search=${searchStr}`;
+    this.callApi(url)
+      .then(res => this.setState({ placesMatch: res.results }))
+      .catch(e => this.setState({ errors: e }));
+  }
+
+  handlePlacesSelect(selectedPlaces, exclude = false) {
+    if (exclude === false) {
+      this.setState(prevState => ({
+        selectedPlaces: [...prevState.selectedPlaces, selectedPlaces],
+        placesInputValue: '',
+        placesMatch: [],
+      }));
+    } else {
+      this.setState(prevState => ({
+        excludedPlaces: [...prevState.excludedPlaces, selectedPlaces],
+        placesInputValue: '',
+        placesMatch: [],
+      }));
+    }
+  }
+
   handleSelectedClick(index, type) {
     switch (type) {
       case 'species': {
@@ -142,7 +196,18 @@ class SearchDisplay extends Component {
         this.setState({ excludedSpecies });
         break;
       }
-      case 'place':
+      case 'places': {
+        const selectedPlaces = [...this.state.selectedPlaces];
+        selectedPlaces.splice(index, 1);
+        this.setState({ selectedPlaces });
+        break;
+      }
+      case 'placesExclude': {
+        const excludedPlaces = [...this.state.excludedPlaces];
+        excludedPlaces.splice(index, 1);
+        this.setState({ excludedPlaces });
+        break;
+      }
       case 'user':
         break;
       default:
@@ -166,8 +231,16 @@ class SearchDisplay extends Component {
     const prevExcludedTaxonIds = prevState.excludedSpecies.map(taxon => taxon.id);
     const currExcludedTaxonIds = this.state.excludedSpecies.map(taxon => taxon.id);
 
+    const prevPlaceIds = prevState.selectedPlaces.map(place => place.id);
+    const currPlaceIds = this.state.selectedPlaces.map(place => place.id);
+
+    const prevExcludedPlaceIds = prevState.excludedPlaces.map(place => place.id);
+    const currExcludedPlaceIds = this.state.excludedPlaces.map(place => place.id);
+
     return !this.isEqualArrays(prevTaxonIds, currTaxonIds)
       || !this.isEqualArrays(prevExcludedTaxonIds, currExcludedTaxonIds)
+      || !this.isEqualArrays(prevPlaceIds, currPlaceIds)
+      || !this.isEqualArrays(prevExcludedPlaceIds, currExcludedPlaceIds)
       || prevState.page !== this.state.page;
   }
 
@@ -176,10 +249,17 @@ class SearchDisplay extends Component {
       const currTaxonIds = this.state.selectedSpecies.map(taxon => taxon.id);
       const currExcludedTaxonIds = this.state.excludedSpecies.map(taxon => taxon.id);
 
+      const currPlaceIds = this.state.selectedPlaces.map(place => place.id);
+      const currExcludedPlaceIds = this.state.excludedPlaces.map(place => place.id);
+
       const queryObj = {};
 
       if (currTaxonIds.length > 0) queryObj.taxon_ids = currTaxonIds.join(',');
       if (currExcludedTaxonIds.length > 0) queryObj.without_taxon_id = currExcludedTaxonIds.join(',');
+
+      if (currPlaceIds.length > 0) queryObj.place_id = currPlaceIds.join(',');
+      if (currExcludedPlaceIds.length > 0) queryObj.not_in_place = currExcludedPlaceIds.join(',');
+
       if (this.state.page !== 1) queryObj.page = this.state.page;
 
       const queryStr = queryString.stringify(queryObj);
@@ -214,13 +294,19 @@ class SearchDisplay extends Component {
     return (
       <SearchDisplayWrapper>
         <SearchFilter
+          handleSelectedClick={this.handleSelectedClick}
           handleSpeciesChange={this.handleSpeciesChange}
           handleSpeciesSelect={this.handleSpeciesSelect}
-          handleSelectedClick={this.handleSelectedClick}
           selectedSpecies={this.state.selectedSpecies}
           excludedSpecies={this.state.excludedSpecies}
           speciesValue={this.state.speciesInputValue}
           speciesMatch={this.state.speciesMatch}
+          handlePlacesChange={this.handlePlacesChange}
+          handlePlacesSelect={this.handlePlacesSelect}
+          selectedPlaces={this.state.selectedPlaces}
+          excludedPlaces={this.state.excludedPlaces}
+          placesValue={this.state.placesInputValue}
+          placesMatch={this.state.placesMatch}
         />
         <SearchResults
           results={this.state.results}

@@ -33,13 +33,21 @@ class SelectedFilters extends Component {
   };
 
   render() {
+    let selectedDisplay;
+    const type = this.props.selectedType;
+    if (type === 'species' || type === 'speciesExclude') {
+      selectedDisplay = this.props.selectedValue.common;
+    } else if (type === 'places' || type === 'placesExclude') {
+      selectedDisplay = this.props.selectedValue.display;
+    }
+
     return (
       <SelectedFilterWrapper onClick={() => this.props.handleSelectedClick(
         this.props.selectedIndex,
         this.props.selectedType,
         this.props.selectedValue,
       )}>
-        <SelectedFilterDisplay>{this.props.selectedValue.common}</SelectedFilterDisplay>
+        <SelectedFilterDisplay>{selectedDisplay}</SelectedFilterDisplay>
         <SelectedFilterClose>x</SelectedFilterClose>
       </SelectedFilterWrapper>
     );

@@ -23,12 +23,12 @@ const AutoCompleteUL = styled.ul`
   z-index: 1000;
 `;
 
-const SpeciesItem = styled.div`
+const MatchItem = styled.div`
   border: solid 1px #333;
   padding: 1px;
 `;
 
-const IncludeSpeciesItem = styled.div`
+const IncludeMatchItem = styled.div`
   display: inline-block;
   width: 100%;
   :hover {
@@ -36,7 +36,7 @@ const IncludeSpeciesItem = styled.div`
   }
 `;
 
-const ExcludeSpeciesItem = styled.div`
+const ExcludeMatchItem = styled.div`
   display: inline-block;
   :hover {
     color: grey;
@@ -78,11 +78,17 @@ class AutoComplete extends Component {
     super(props);
 
     this.handleSpeciesSelect = this.handleSpeciesSelect.bind(this);
+    this.handlePlacesSelect = this.handlePlacesSelect.bind(this);
+
+    this.displaySpecies = this.displaySpecies.bind(this);
+    this.displayPlaces = this.displayPlaces.bind(this);
   }
 
   static propTypes= {
+    type: PropTypes.string.isRequired,
     matches: PropTypes.array.isRequired,
-    handleSpeciesSelect: PropTypes.func.isRequired,
+    handleSpeciesSelect: PropTypes.func,
+    handlePlacesSelect: PropTypes.func,
   };
 
   handleSpeciesSelect = (species, exclude) => {
@@ -94,49 +100,87 @@ class AutoComplete extends Component {
     this.props.handleSpeciesSelect(selectedSpecies, exclude);
   }
 
-  render() {
-    const speciesList = this.props.matches.map((species) => {
-      let photoElem;
-      if (species.default_photo && species.default_photo.square_url) {
-        photoElem = <PhotoImg
-          src={species.default_photo.square_url}
-          alt={species.name}
-        />;
-      } else {
-        photoElem = '';
-      }
+  handlePlacesSelect = (place, exclude) => {
+    const selectedPlaces = {
+      id: place.id,
+      name: place.name,
+      display: place.display_name,
+    };
+    this.props.handlePlacesSelect(selectedPlaces, exclude);
+  }
 
-      return (
-        <li key={species.id} data-id={species.id}>
-            <SpeciesItem>
-              <Row>
-                <Col xs={9} className="trimText">
-                  <IncludeSpeciesItem onClick={() => this.handleSpeciesSelect(species, false)}>
-                    <PhotoDiv>
-                      {photoElem}
-                    </PhotoDiv>
-                    <Names>
-                      <CommonName>{species.preferred_common_name}</CommonName>
-                      <Latin>
-                        <Rank>{species.rank === 'species' ? '' : `${species.rank}\u00a0`}</Rank><LatinName>{species.name}</LatinName></Latin>
-                    </Names>
-                  </IncludeSpeciesItem>
-                </Col>
-                <Col xs={3} className="autocomplete-exclude-species">
-                  <ExcludeSpeciesItem onClick={() => this.handleSpeciesSelect(species, true)}>
-                    Exclude
-                  </ExcludeSpeciesItem>
-                </Col>
-              </Row>
-            </SpeciesItem>
-        </li>
-      );
-    });
+  displaySpecies = () => this.props.matches.map((species) => {
+    let photoElem;
+    if (species.default_photo && species.default_photo.square_url) {
+      photoElem = <PhotoImg
+        src={species.default_photo.square_url}
+        alt={species.name}
+      />;
+    } else {
+      photoElem = '';
+    }
+
+    return (
+      <li key={species.id} data-id={species.id}>
+          <MatchItem>
+            <Row>
+              <Col xs={9} className="trimText">
+                <IncludeMatchItem onClick={() => this.handleSpeciesSelect(species, false)}>
+                  <PhotoDiv>
+                    {photoElem}
+                  </PhotoDiv>
+                  <Names>
+                    <CommonName>{species.preferred_common_name}</CommonName>
+                    <Latin>
+                      <Rank>{species.rank === 'species' ? '' : `${species.rank}\u00a0`}</Rank><LatinName>{species.name}</LatinName>
+                    </Latin>
+                  </Names>
+                </IncludeMatchItem>
+              </Col>
+              <Col xs={3} className="autocomplete-exclude-matches">
+                <ExcludeMatchItem onClick={() => this.handleSpeciesSelect(species, true)}>
+                  Exclude
+                </ExcludeMatchItem>
+              </Col>
+            </Row>
+          </MatchItem>
+      </li>
+    );
+  });
+
+  displayPlaces = () => this.props.matches.map(place => (
+    <li key={place.id} data-id={place.id}>
+        <MatchItem>
+          <Row>
+            <Col xs={9} className="trimText">
+              <IncludeMatchItem onClick={() => this.handlePlacesSelect(place, false)}>
+                <Names>
+                  <CommonName>{place.display_name}</CommonName>
+                </Names>
+              </IncludeMatchItem>
+            </Col>
+            <Col xs={3} className="autocomplete-exclude-matches">
+              <ExcludeMatchItem onClick={() => this.handlePlacesSelect(place, true)}>
+                Exclude
+              </ExcludeMatchItem>
+            </Col>
+          </Row>
+        </MatchItem>
+    </li>
+  ));
+
+  render() {
+    let matchesList;
+    if (this.props.type === 'species') {
+      matchesList = this.displaySpecies();
+    } else if (this.props.type === 'places') {
+      matchesList = this.displayPlaces();
+    }
 
     return (
       <div>
         <AutoCompleteUL>
-          {speciesList}
+          {matchesList}
         </AutoCompleteUL>
       </div>
     );

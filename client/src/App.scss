@@ -185,12 +185,13 @@ img {
 }
 
 .trimText{
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis
+  margin: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.autocomplete-exclude-species {
+.autocomplete-exclude-matches {
   border-left: solid 1px gray;
   line-height: 40px;
   margin: auto;
