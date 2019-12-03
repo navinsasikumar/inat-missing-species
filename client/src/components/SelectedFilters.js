@@ -16,7 +16,6 @@ const SelectedFilterWrapper = styled.div`
 
 const SelectedFilterDisplay = styled.div`
   display: inline-block;
-  text-transform: capitalize;
 `;
 
 const SelectedFilterClose = styled.div`
@@ -32,11 +31,15 @@ class SelectedFilters extends Component {
     selectedValue: PropTypes.object.isRequired,
   };
 
+  toTitleCase = str => str.replace(
+    /\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(),
+  );
+
   render() {
     let selectedDisplay;
     const type = this.props.selectedType;
     if (type === 'species' || type === 'speciesExclude') {
-      selectedDisplay = this.props.selectedValue.common;
+      selectedDisplay = this.toTitleCase(this.props.selectedValue.common);
     } else if (type === 'places' || type === 'placesExclude') {
       selectedDisplay = this.props.selectedValue.display;
     } else if (type === 'users' || type === 'usersExclude') {
