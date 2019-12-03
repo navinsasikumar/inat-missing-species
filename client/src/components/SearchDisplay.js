@@ -26,6 +26,9 @@ class SearchDisplay extends Component {
     this.handlePlacesChange = this.handlePlacesChange.bind(this);
     this.handlePlacesSelect = this.handlePlacesSelect.bind(this);
 
+    this.handleUsersChange = this.handleUsersChange.bind(this);
+    this.handleUsersSelect = this.handleUsersSelect.bind(this);
+
     this.handleSelectedClick = this.handleSelectedClick.bind(this);
     this.handlePageClick = this.handlePageClick.bind(this);
 
@@ -45,6 +48,10 @@ class SearchDisplay extends Component {
       excludedPlaces: [],
       placesInputValue: '',
       placesMatch: [],
+      selectedUsers: [],
+      excludedUsers: [],
+      usersInputValue: '',
+      usersMatch: [],
     };
   }
 
@@ -74,6 +81,14 @@ class SearchDisplay extends Component {
     }
   )
 
+  makeUserObj = user => (
+    {
+      id: user.id,
+      name: user.name,
+      login: user.login,
+    }
+  )
+
   splitQueryStr = async (queryStr) => {
     const query = queryString.parse(queryStr);
     // console.log(query);
@@ -95,6 +110,15 @@ class SearchDisplay extends Component {
     if (query.not_in_place) {
       const getPlacesRes = await this.callApi(`/api/places/${query.not_in_place}`);
       newState.excludedPlaces = getPlacesRes.results.map(this.makePlaceObj);
+    }
+
+    if (query.user_id) {
+      const getUsersRes = await this.callApi(`/api/users/${query.user_id}`);
+      newState.selectedUsers = getUsersRes.results.map(this.makeUserObj);
+    }
+    if (query.not_user_id) {
+      const getUsersRes = await this.callApi(`/api/users/${query.not_user_id}`);
+      newState.excludedUsers = getUsersRes.results.map(this.makeUserObj);
     }
 
     if (query.page) {
@@ -182,6 +206,32 @@ class SearchDisplay extends Component {
     }
   }
 
+
+  handleUsersChange(event) {
+    const searchStr = event.target.value;
+    this.setState({ usersInputValue: searchStr });
+    const url = `/api/users/autocomplete?search=${searchStr}`;
+    this.callApi(url)
+      .then(res => this.setState({ usersMatch: res.results }))
+      .catch(e => this.setState({ errors: e }));
+  }
+
+  handleUsersSelect(selectedUsers, exclude = false) {
+    if (exclude === false) {
+      this.setState(prevState => ({
+        selectedUsers: [...prevState.selectedUsers, selectedUsers],
+        usersInputValue: '',
+        usersMatch: [],
+      }));
+    } else {
+      this.setState(prevState => ({
+        excludedUsers: [...prevState.excludedUsers, selectedUsers],
+        usersInputValue: '',
+        usersMatch: [],
+      }));
+    }
+  }
+
   handleSelectedClick(index, type) {
     switch (type) {
       case 'species': {
@@ -208,8 +258,18 @@ class SearchDisplay extends Component {
         this.setState({ excludedPlaces });
         break;
       }
-      case 'user':
+      case 'users': {
+        const selectedUsers = [...this.state.selectedUsers];
+        selectedUsers.splice(index, 1);
+        this.setState({ selectedUsers });
         break;
+      }
+      case 'usersExclude': {
+        const excludedUsers = [...this.state.excludedUsers];
+        excludedUsers.splice(index, 1);
+        this.setState({ excludedUsers });
+        break;
+      }
       default:
     }
   }
@@ -237,10 +297,18 @@ class SearchDisplay extends Component {
     const prevExcludedPlaceIds = prevState.excludedPlaces.map(place => place.id);
     const currExcludedPlaceIds = this.state.excludedPlaces.map(place => place.id);
 
+    const prevUserIds = prevState.selectedUsers.map(user => user.id);
+    const currUserIds = this.state.selectedUsers.map(user => user.id);
+
+    const prevExcludedUserIds = prevState.excludedUsers.map(user => user.id);
+    const currExcludedUserIds = this.state.excludedUsers.map(user => user.id);
+
     return !this.isEqualArrays(prevTaxonIds, currTaxonIds)
       || !this.isEqualArrays(prevExcludedTaxonIds, currExcludedTaxonIds)
       || !this.isEqualArrays(prevPlaceIds, currPlaceIds)
       || !this.isEqualArrays(prevExcludedPlaceIds, currExcludedPlaceIds)
+      || !this.isEqualArrays(prevUserIds, currUserIds)
+      || !this.isEqualArrays(prevExcludedUserIds, currExcludedUserIds)
       || prevState.page !== this.state.page;
   }
 
@@ -252,6 +320,9 @@ class SearchDisplay extends Component {
       const currPlaceIds = this.state.selectedPlaces.map(place => place.id);
       const currExcludedPlaceIds = this.state.excludedPlaces.map(place => place.id);
 
+      const currUserIds = this.state.selectedUsers.map(user => user.id);
+      const currExcludedUserIds = this.state.excludedUsers.map(user => user.id);
+
       const queryObj = {};
 
       if (currTaxonIds.length > 0) queryObj.taxon_ids = currTaxonIds.join(',');
@@ -259,6 +330,9 @@ class SearchDisplay extends Component {
 
       if (currPlaceIds.length > 0) queryObj.place_id = currPlaceIds.join(',');
       if (currExcludedPlaceIds.length > 0) queryObj.not_in_place = currExcludedPlaceIds.join(',');
+
+      if (currUserIds.length > 0) queryObj.user_id = currUserIds.join(',');
+      if (currExcludedUserIds.length > 0) queryObj.not_user_id = currExcludedUserIds.join(',');
 
       if (this.state.page !== 1) queryObj.page = this.state.page;
 
@@ -307,6 +381,12 @@ class SearchDisplay extends Component {
           excludedPlaces={this.state.excludedPlaces}
           placesValue={this.state.placesInputValue}
           placesMatch={this.state.placesMatch}
+          handleUsersChange={this.handleUsersChange}
+          handleUsersSelect={this.handleUsersSelect}
+          selectedUsers={this.state.selectedUsers}
+          excludedUsers={this.state.excludedUsers}
+          usersValue={this.state.usersInputValue}
+          usersMatch={this.state.usersMatch}
         />
         <SearchResults
           results={this.state.results}

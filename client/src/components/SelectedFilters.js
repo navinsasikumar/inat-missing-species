@@ -39,6 +39,8 @@ class SelectedFilters extends Component {
       selectedDisplay = this.props.selectedValue.common;
     } else if (type === 'places' || type === 'placesExclude') {
       selectedDisplay = this.props.selectedValue.display;
+    } else if (type === 'users' || type === 'usersExclude') {
+      selectedDisplay = this.props.selectedValue.login;
     }
 
     return (

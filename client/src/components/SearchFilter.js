@@ -26,6 +26,9 @@ const MultiSelected = styled.div`
   display: inline-block;
   font-size: 65%;
   padding-right: 20px;
+  &:empty {
+    display:none;
+  }
 `;
 
 class SearchFilter extends Component {
@@ -43,6 +46,12 @@ class SearchFilter extends Component {
     placesMatch: PropTypes.array.isRequired,
     selectedPlaces: PropTypes.array.isRequired,
     placesValue: PropTypes.string,
+    excludedUsers: PropTypes.array.isRequired,
+    handleUsersChange: PropTypes.func.isRequired,
+    handleUsersSelect: PropTypes.func.isRequired,
+    usersMatch: PropTypes.array.isRequired,
+    selectedUsers: PropTypes.array.isRequired,
+    usersValue: PropTypes.string,
   };
 
   render() {
@@ -51,6 +60,9 @@ class SearchFilter extends Component {
 
     const selectedPlacesLabel = this.props.selectedPlaces.length > 0 ? 'Selected Places: ' : '';
     const excludedPlacesLabel = this.props.excludedPlaces.length > 0 ? 'Excluded Places: ' : '';
+
+    const selectedUsersLabel = this.props.selectedUsers.length > 0 ? 'Selected Users: ' : '';
+    const excludedUsersLabel = this.props.excludedUsers.length > 0 ? 'Excluded Users: ' : '';
 
     return (
       <SearchFilterWrapper>
@@ -114,6 +126,43 @@ class SearchFilter extends Component {
                     />
                   ))}
                 </MultiSelected>
+              </FormGroup>
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={12} md={6}>
+              <FormGroup>
+                <Form.Control size="sm" type="text" placeholder="Observing User" onChange={this.props.handleUsersChange} value={this.props.usersValue} />
+                <AutoComplete type="users" matches={this.props.usersMatch} handleUsersSelect={this.props.handleUsersSelect}/>
+                <MultiSelected>
+                  {selectedUsersLabel}
+                  {this.props.selectedUsers.map((user, index) => (
+                    <SelectedFilters
+                      key={user.id}
+                      selectedIndex={index}
+                      selectedValue={user}
+                      selectedType="users"
+                      handleSelectedClick={this.props.handleSelectedClick}
+                    />
+                  ))}
+                </MultiSelected>
+                <MultiSelected>
+                  {excludedUsersLabel}
+                  {this.props.excludedUsers.map((user, index) => (
+                    <SelectedFilters
+                      key={user.id}
+                      selectedIndex={index}
+                      selectedValue={user}
+                      selectedType="usersExclude"
+                      handleSelectedClick={this.props.handleSelectedClick}
+                    />
+                  ))}
+                </MultiSelected>
+              </FormGroup>
+            </Col>
+            <Col xs={12} md={6}>
+              <FormGroup>
+                <Form.Control size="sm" type="text" placeholder="Identifying User" onChange={this.props.handlePlacesChange} value={this.props.placesValue} />
               </FormGroup>
             </Col>
           </Row>

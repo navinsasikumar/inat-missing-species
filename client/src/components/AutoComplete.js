@@ -78,10 +78,13 @@ class AutoComplete extends Component {
     super(props);
 
     this.handleSpeciesSelect = this.handleSpeciesSelect.bind(this);
-    this.handlePlacesSelect = this.handlePlacesSelect.bind(this);
-
     this.displaySpecies = this.displaySpecies.bind(this);
+
+    this.handlePlacesSelect = this.handlePlacesSelect.bind(this);
     this.displayPlaces = this.displayPlaces.bind(this);
+
+    this.handleUsersSelect = this.handleUsersSelect.bind(this);
+    this.displayUsers = this.displayUsers.bind(this);
   }
 
   static propTypes= {
@@ -89,6 +92,7 @@ class AutoComplete extends Component {
     matches: PropTypes.array.isRequired,
     handleSpeciesSelect: PropTypes.func,
     handlePlacesSelect: PropTypes.func,
+    handleUsersSelect: PropTypes.func,
   };
 
   handleSpeciesSelect = (species, exclude) => {
@@ -98,15 +102,6 @@ class AutoComplete extends Component {
       common: species.preferred_common_name,
     };
     this.props.handleSpeciesSelect(selectedSpecies, exclude);
-  }
-
-  handlePlacesSelect = (place, exclude) => {
-    const selectedPlaces = {
-      id: place.id,
-      name: place.name,
-      display: place.display_name,
-    };
-    this.props.handlePlacesSelect(selectedPlaces, exclude);
   }
 
   displaySpecies = () => this.props.matches.map((species) => {
@@ -148,6 +143,15 @@ class AutoComplete extends Component {
     );
   });
 
+  handlePlacesSelect = (place, exclude) => {
+    const selectedPlaces = {
+      id: place.id,
+      name: place.name,
+      display: place.display_name,
+    };
+    this.props.handlePlacesSelect(selectedPlaces, exclude);
+  }
+
   displayPlaces = () => this.props.matches.map(place => (
     <li key={place.id} data-id={place.id}>
         <MatchItem>
@@ -169,12 +173,62 @@ class AutoComplete extends Component {
     </li>
   ));
 
+  handleUsersSelect = (user, exclude) => {
+    const selectedUsers = {
+      id: user.id,
+      name: user.name,
+      login: user.login,
+    };
+    this.props.handleUsersSelect(selectedUsers, exclude);
+  }
+
+  displayUsers = () => this.props.matches.map((user) => {
+    let photoElem;
+    if (user.icon) {
+      photoElem = <PhotoImg
+        src={user.icon}
+        alt={user.login}
+      />;
+    } else {
+      photoElem = '';
+    }
+
+    return (
+      <li key={user.id} data-id={user.id}>
+          <MatchItem>
+            <Row>
+              <Col xs={9} className="trimText">
+                <IncludeMatchItem onClick={() => this.handleUsersSelect(user, false)}>
+                  <PhotoDiv>
+                    {photoElem}
+                  </PhotoDiv>
+                  <Names>
+                    <CommonName>{user.name}</CommonName>
+                    <Latin>
+                      <LatinName>{user.login}</LatinName>
+                    </Latin>
+                  </Names>
+                </IncludeMatchItem>
+              </Col>
+              <Col xs={3} className="autocomplete-exclude-matches">
+                <ExcludeMatchItem onClick={() => this.handleUsersSelect(user, true)}>
+                  Exclude
+                </ExcludeMatchItem>
+              </Col>
+            </Row>
+          </MatchItem>
+      </li>
+    );
+  });
+
   render() {
     let matchesList;
     if (this.props.type === 'species') {
       matchesList = this.displaySpecies();
     } else if (this.props.type === 'places') {
       matchesList = this.displayPlaces();
+    } else if (this.props.type === 'users') {
+      matchesList = this.displayUsers();
     }
 
     return (
