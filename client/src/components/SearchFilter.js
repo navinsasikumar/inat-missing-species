@@ -2,7 +2,11 @@
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { Component } from 'react';
-import { Form } from 'react-bootstrap';
+import {
+  Col,
+  Form,
+  Row,
+} from 'react-bootstrap';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import AutoComplete from './AutoComplete';
@@ -51,62 +55,68 @@ class SearchFilter extends Component {
     return (
       <SearchFilterWrapper>
         <Form>
-          <FormGroup>
-            <Form.Control size="md" type="text" placeholder="Species" onChange={this.props.handleSpeciesChange} value={this.props.speciesValue} />
-            <AutoComplete type="species" matches={this.props.speciesMatch} handleSpeciesSelect={this.props.handleSpeciesSelect}/>
-            <MultiSelected>
-              {selectedSpeciesLabel}
-              {this.props.selectedSpecies.map((species, index) => (
-                <SelectedFilters
-                  key={species.id}
-                  selectedIndex={index}
-                  selectedValue={species}
-                  selectedType="species"
-                  handleSelectedClick={this.props.handleSelectedClick}
-                />
-              ))}
-            </MultiSelected>
-            <MultiSelected>
-              {excludedSpeciesLabel}
-              {this.props.excludedSpecies.map((species, index) => (
-                <SelectedFilters
-                  key={species.id}
-                  selectedIndex={index}
-                  selectedValue={species}
-                  selectedType="speciesExclude"
-                  handleSelectedClick={this.props.handleSelectedClick}
-                />
-              ))}
-            </MultiSelected>
-          </FormGroup>
-          <FormGroup>
-            <Form.Control size="md" type="text" placeholder="Location" onChange={this.props.handlePlacesChange} value={this.props.placesValue} />
-            <AutoComplete type="places" matches={this.props.placesMatch} handlePlacesSelect={this.props.handlePlacesSelect}/>
-            <MultiSelected>
-              {selectedPlacesLabel}
-              {this.props.selectedPlaces.map((place, index) => (
-                <SelectedFilters
-                  key={place.id}
-                  selectedIndex={index}
-                  selectedValue={place}
-                  selectedType="places"
-                  handleSelectedClick={this.props.handleSelectedClick}
-                />
-              ))}
-            </MultiSelected>
-            <MultiSelected>
-              {excludedPlacesLabel}
-              {this.props.excludedPlaces.map((place, index) => (
-                <SelectedFilters
-                  key={place.id}
-                  selectedIndex={index}
-                  selectedValue={place}
-                  selectedType="placesExclude"
-                  handleSelectedClick={this.props.handleSelectedClick}
-                />
-              ))}
-            </MultiSelected>
-          </FormGroup>
+          <Row>
+            <Col xs={12} md={6}>
+              <FormGroup>
+                <Form.Control size="sm" type="text" placeholder="Species" onChange={this.props.handleSpeciesChange} value={this.props.speciesValue} />
+                <AutoComplete type="species" matches={this.props.speciesMatch} handleSpeciesSelect={this.props.handleSpeciesSelect}/>
+                <MultiSelected>
+                  {selectedSpeciesLabel}
+                  {this.props.selectedSpecies.map((species, index) => (
+                    <SelectedFilters
+                      key={species.id}
+                      selectedIndex={index}
+                      selectedValue={species}
+                      selectedType="species"
+                      handleSelectedClick={this.props.handleSelectedClick}
+                    />
+                  ))}
+                </MultiSelected>
+                <MultiSelected>
+                  {excludedSpeciesLabel}
+                  {this.props.excludedSpecies.map((species, index) => (
+                    <SelectedFilters
+                      key={species.id}
+                      selectedIndex={index}
+                      selectedValue={species}
+                      selectedType="speciesExclude"
+                      handleSelectedClick={this.props.handleSelectedClick}
+                    />
+                  ))}
+                </MultiSelected>
+              </FormGroup>
+            </Col>
+            <Col xs={12} md={6}>
+              <FormGroup>
+                <Form.Control size="sm" type="text" placeholder="Location" onChange={this.props.handlePlacesChange} value={this.props.placesValue} />
+                <AutoComplete type="places" matches={this.props.placesMatch} handlePlacesSelect={this.props.handlePlacesSelect}/>
+                <MultiSelected>
+                  {selectedPlacesLabel}
+                  {this.props.selectedPlaces.map((place, index) => (
+                    <SelectedFilters
+                      key={place.id}
+                      selectedIndex={index}
+                      selectedValue={place}
+                      selectedType="places"
+                      handleSelectedClick={this.props.handleSelectedClick}
+                    />
+                  ))}
+                </MultiSelected>
+                <MultiSelected>
+                  {excludedPlacesLabel}
+                  {this.props.excludedPlaces.map((place, index) => (
+                    <SelectedFilters
+                      key={place.id}
+                      selectedIndex={index}
+                      selectedValue={place}
+                      selectedType="placesExclude"
+                      handleSelectedClick={this.props.handleSelectedClick}
+                    />
+                  ))}
+                </MultiSelected>
+              </FormGroup>
+            </Col>
+          </Row>
         </Form>
       </SearchFilterWrapper>
     );
