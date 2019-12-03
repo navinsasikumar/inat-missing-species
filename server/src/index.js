@@ -38,6 +38,8 @@ app.get('/api/taxa/autocomplete', inatRoutes.autocompleteTaxa);
 app.get('/api/taxa/:ids', inatRoutes.getTaxa);
 app.get('/api/places/autocomplete', inatRoutes.autocompletePlaces);
 app.get('/api/places/:ids', inatRoutes.getPlaces);
+app.get('/api/users/autocomplete', inatRoutes.autocompleteUsers);
+app.get('/api/users/:ids', inatRoutes.getUsers);
 
 // All remaining requests return the React app, so it can handle routing.
 app.get('*', function(request, response) {
