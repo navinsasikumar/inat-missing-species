@@ -1,5 +1,6 @@
 const myCounts = require('../lib/mycounts');
 const Taxa = require('../lib/Taxa');
+const Places = require('../lib/Places');
 const Observations = require('../lib/Observations');
 
 const speciesCounts = async (req, res) => {
@@ -25,6 +26,28 @@ const autocompleteTaxa = async (req, res) => {
   return res.send(results);
 };
 
+const getPlaces = async (req, res) => {
+  try {
+    const places = new Places();
+    const results = await places.get(req.params.ids);
+    return res.send(results);
+  } catch (e) {
+    console.error(e);
+    return res.send({ results: [] });
+  }
+};
+
+const autocompletePlaces = async (req, res) => {
+  try {
+    const places = new Places(10);
+    const results = await places.autocomplete(req.query.search);
+    return res.send(results);
+  } catch (e) {
+    console.error(e);
+    return res.send({ results: [] });
+  }
+};
+
 const getObservations = async (req, res) => {
   const observations = new Observations();
   const results = await observations.get(req.query);
@@ -35,5 +58,7 @@ module.exports = {
   speciesCounts,
   getTaxa,
   autocompleteTaxa,
+  getPlaces,
+  autocompletePlaces,
   getObservations,
 };
