@@ -57,6 +57,8 @@ class SearchFilter extends Component {
     identUsersMatch: PropTypes.array.isRequired,
     selectedIdentUsers: PropTypes.array.isRequired,
     identUsersValue: PropTypes.string,
+    checkboxes: PropTypes.object,
+    handleCheckbox: PropTypes.func.isRequired,
   };
 
   render() {
@@ -184,6 +186,24 @@ class SearchFilter extends Component {
                   ))}
                 </MultiSelected>
               </FormGroup>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'captive')} id="captive-check" label="Captive" checked={this.props.checkboxes && (this.props.checkboxes.captive === 'true' || this.props.checkboxes.captive === 'any')} />
+              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'wild')} id="wild-check" label="Wild" checked={this.props.checkboxes && (this.props.checkboxes.captive === 'false' || this.props.checkboxes.wild === 'true' || this.props.checkboxes.captive === 'any')} />
+              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'native')} id="native-check" label="Native" />
+              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'introduced')} id="introduced-check" label="Introduced" />
+              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'outOfRange')} id="oor-check" label="Out of Range" />
+              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'threatened')} id="threatened-check" label="Threatened" />
+              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'endemic')} id="endemic-check" label="Endemic" />
+              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'verifiable')} id="verifiable-check" label="Verifiable" />
+              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'research')} id="rg-check" label="Research Grade" checked={this.props.checkboxes && (this.props.checkboxes.qualityGrade === 'research')} />
+              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'needs_id')} id="needs-id-check" label="Needs ID" checked={this.props.checkboxes && (this.props.checkboxes.qualityGrade === 'needs_id')} />
+              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'casual')} id="casual-check" label="Casual" checked={this.props.checkboxes && (this.props.checkboxes.qualityGrade === 'casual')} />
+              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'hasPhotos')} id="photos-check" label="Has Photos" />
+              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'hasSounds')} id="sounds-check" label="Has Sounds" />
+              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'popular')} id="popular-check" label="Popular" />
             </Col>
           </Row>
         </Form>

@@ -33,6 +33,7 @@ class SearchDisplay extends Component {
     this.handleIdentUsersSelect = this.handleIdentUsersSelect.bind(this);
 
     this.handleSelectedClick = this.handleSelectedClick.bind(this);
+    this.handleCheckbox = this.handleCheckbox.bind(this);
     this.handlePageClick = this.handlePageClick.bind(this);
 
     this.state = {
@@ -58,6 +59,7 @@ class SearchDisplay extends Component {
       selectedIdentUsers: [],
       identUsersInputValue: '',
       identUsersMatch: [],
+      checkboxes: {},
     };
   }
 
@@ -97,7 +99,6 @@ class SearchDisplay extends Component {
 
   splitQueryStr = async (queryStr) => {
     const query = queryString.parse(queryStr);
-    // console.log(query);
     const newState = {};
 
     if (query.taxon_ids) {
@@ -130,6 +131,16 @@ class SearchDisplay extends Component {
     if (query.ident_user_id) {
       const getIdentUsersRes = await this.callApi(`/api/users/${query.ident_user_id}`);
       newState.selectedIdentUsers = getIdentUsersRes.results.map(this.makeUserObj);
+    }
+
+    if (query.captive) {
+      if (newState.checkboxes && typeof newState.checkboxes === 'object') {
+        newState.checkboxes.captive = query.captive;
+      } else {
+        newState.checkboxes = {
+          captive: query.captive,
+        };
+      }
     }
 
     if (query.page) {
@@ -263,6 +274,27 @@ class SearchDisplay extends Component {
     }
   }
 
+  handleCheckbox = (e, clickedType) => {
+    let type = clickedType;
+    if (clickedType === 'research' || clickedType === 'needs_id' || clickedType === 'casual') {
+      type = 'qualityGrade';
+    }
+
+    if (e.target.checked === true) {
+      const checkboxes = {};
+      checkboxes[type] = type === 'qualityGrade' ? clickedType : 'true';
+      this.setState(prevState => ({
+        checkboxes: { ...prevState.checkboxes, ...checkboxes },
+      }));
+    } else {
+      this.setState((prevState) => {
+        const copy = Object.assign({}, prevState.checkboxes);
+        delete copy[type];
+        return { checkboxes: copy };
+      });
+    }
+  }
+
   handleSelectedClick(index, type) {
     switch (type) {
       case 'species': {
@@ -350,6 +382,7 @@ class SearchDisplay extends Component {
       || !this.isEqualArrays(prevUserIds, currUserIds)
       || !this.isEqualArrays(prevExcludedUserIds, currExcludedUserIds)
       || !this.isEqualArrays(prevIdentUserIds, currIdentUserIds)
+      || JSON.stringify(prevState.checkboxes) !== JSON.stringify(this.state.checkboxes)
       || prevState.page !== this.state.page;
   }
 
@@ -395,6 +428,73 @@ class SearchDisplay extends Component {
     return queryObj;
   }
 
+  makeCheckboxesQuery = () => { // TODO
+    const queryObj = {};
+    const { checkboxes } = this.state;
+    if (checkboxes.captive === 'true' && checkboxes.wild === 'true') {
+      queryObj.captive = 'any';
+    } else if (checkboxes.captive === 'true' || checkboxes.wild === 'false') {
+      queryObj.captive = 'true';
+    } else if (checkboxes.wild === 'true' || checkboxes.captive === 'false') {
+      queryObj.captive = 'false';
+    }
+
+    if (checkboxes.native) {
+      queryObj.native = 'true';
+    }
+
+    if (checkboxes.introduced) {
+      queryObj.introduced = 'true';
+    }
+
+    if (checkboxes.outOfRange) {
+      queryObj.out_of_range = 'true';
+    }
+
+    if (checkboxes.threatened) {
+      queryObj.threatened = 'true';
+    }
+
+    if (checkboxes.endemic) {
+      queryObj.endemic = 'true';
+    }
+
+    if (checkboxes.verifiable) {
+      queryObj.verifiable = 'true';
+    }
+
+    /*
+    if (checkboxes.researchGrade) {
+      queryObj.quality_grade = 'research';
+    }
+
+    if (checkboxes.needsId) {
+      queryObj.quality_grade = 'needs_id';
+    }
+
+    if (checkboxes.casual) {
+      queryObj.quality_grade = 'casual';
+    } */
+
+    if (checkboxes.qualityGrade) {
+      queryObj.quality_grade = checkboxes.qualityGrade;
+    }
+
+    if (checkboxes.hasPhotos) {
+      queryObj.photos = 'true';
+    }
+
+    if (checkboxes.hasSounds) {
+      queryObj.sounds = 'true';
+    }
+
+    if (checkboxes.popular) {
+      queryObj.popular = 'true';
+    }
+
+    return queryObj;
+  }
+
   componentDidUpdate(prevProps, prevState) {
     if (this.shouldUpdate(prevProps, prevState)) {
       const queryObj = {
@@ -402,6 +502,7 @@ class SearchDisplay extends Component {
         ...this.makePlacesQuery(),
         ...this.makeUsersQuery(),
         ...this.makeIdentUsersQuery(),
+        ...this.makeCheckboxesQuery(),
       };
 
       if (this.state.page !== 1) queryObj.page = this.state.page;
@@ -462,6 +563,8 @@ class SearchDisplay extends Component {
           selectedIdentUsers={this.state.selectedIdentUsers}
           identUsersValue={this.state.identUsersInputValue}
           identUsersMatch={this.state.identUsersMatch}
+          checkboxes={this.state.checkboxes}
+          handleCheckbox={this.handleCheckbox}
         />
         <SearchResults
           results={this.state.results}
