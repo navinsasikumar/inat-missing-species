@@ -29,6 +29,9 @@ class SearchDisplay extends Component {
     this.handleUsersChange = this.handleUsersChange.bind(this);
     this.handleUsersSelect = this.handleUsersSelect.bind(this);
 
+    this.handleIdentUsersChange = this.handleIdentUsersChange.bind(this);
+    this.handleIdentUsersSelect = this.handleIdentUsersSelect.bind(this);
+
     this.handleSelectedClick = this.handleSelectedClick.bind(this);
     this.handlePageClick = this.handlePageClick.bind(this);
 
@@ -52,6 +55,9 @@ class SearchDisplay extends Component {
       excludedUsers: [],
       usersInputValue: '',
       usersMatch: [],
+      selectedIdentUsers: [],
+      identUsersInputValue: '',
+      identUsersMatch: [],
     };
   }
 
@@ -119,6 +125,11 @@ class SearchDisplay extends Component {
     if (query.not_user_id) {
       const getUsersRes = await this.callApi(`/api/users/${query.not_user_id}`);
       newState.excludedUsers = getUsersRes.results.map(this.makeUserObj);
+    }
+
+    if (query.ident_user_id) {
+      const getIdentUsersRes = await this.callApi(`/api/users/${query.ident_user_id}`);
+      newState.selectedIdentUsers = getIdentUsersRes.results.map(this.makeUserObj);
     }
 
     if (query.page) {
@@ -232,6 +243,26 @@ class SearchDisplay extends Component {
     }
   }
 
+
+  handleIdentUsersChange(event) {
+    const searchStr = event.target.value;
+    this.setState({ identUsersInputValue: searchStr });
+    const url = `/api/users/autocomplete?search=${searchStr}`;
+    this.callApi(url)
+      .then(res => this.setState({ identUsersMatch: res.results }))
+      .catch(e => this.setState({ errors: e }));
+  }
+
+  handleIdentUsersSelect(selectedIdentUsers, exclude = false) {
+    if (exclude === false) {
+      this.setState(prevState => ({
+        selectedIdentUsers: [...prevState.selectedIdentUsers, selectedIdentUsers],
+        identUsersInputValue: '',
+        identUsersMatch: [],
+      }));
+    }
+  }
+
   handleSelectedClick(index, type) {
     switch (type) {
       case 'species': {
@@ -270,6 +301,12 @@ class SearchDisplay extends Component {
         this.setState({ excludedUsers });
         break;
       }
+      case 'identUsers': {
+        const selectedIdentUsers = [...this.state.selectedIdentUsers];
+        selectedIdentUsers.splice(index, 1);
+        this.setState({ selectedIdentUsers });
+        break;
+      }
       default:
     }
   }
@@ -303,36 +340,69 @@ class SearchDisplay extends Component {
     const prevExcludedUserIds = prevState.excludedUsers.map(user => user.id);
     const currExcludedUserIds = this.state.excludedUsers.map(user => user.id);
 
+    const prevIdentUserIds = prevState.selectedIdentUsers.map(user => user.id);
+    const currIdentUserIds = this.state.selectedIdentUsers.map(user => user.id);
+
     return !this.isEqualArrays(prevTaxonIds, currTaxonIds)
       || !this.isEqualArrays(prevExcludedTaxonIds, currExcludedTaxonIds)
       || !this.isEqualArrays(prevPlaceIds, currPlaceIds)
       || !this.isEqualArrays(prevExcludedPlaceIds, currExcludedPlaceIds)
       || !this.isEqualArrays(prevUserIds, currUserIds)
       || !this.isEqualArrays(prevExcludedUserIds, currExcludedUserIds)
+      || !this.isEqualArrays(prevIdentUserIds, currIdentUserIds)
       || prevState.page !== this.state.page;
+  }
+
+  makeTaxaQuery = () => {
+    const queryObj = {};
+    const currTaxonIds = this.state.selectedSpecies.map(taxon => taxon.id);
+    const currExcludedTaxonIds = this.state.excludedSpecies.map(taxon => taxon.id);
+
+    if (currTaxonIds.length > 0) queryObj.taxon_ids = currTaxonIds.join(',');
+    if (currExcludedTaxonIds.length > 0) queryObj.without_taxon_id = currExcludedTaxonIds.join(',');
+
+    return queryObj;
+  }
+
+  makePlacesQuery = () => {
+    const queryObj = {};
+    const currPlaceIds = this.state.selectedPlaces.map(place => place.id);
+    const currExcludedPlaceIds = this.state.excludedPlaces.map(place => place.id);
+
+    if (currPlaceIds.length > 0) queryObj.place_id = currPlaceIds.join(',');
+    if (currExcludedPlaceIds.length > 0) queryObj.not_in_place = currExcludedPlaceIds.join(',');
+
+    return queryObj;
+  }
+
+  makeUsersQuery = () => {
+    const queryObj = {};
+    const currUserIds = this.state.selectedUsers.map(user => user.id);
+    const currExcludedUserIds = this.state.excludedUsers.map(user => user.id);
+
+    if (currUserIds.length > 0) queryObj.user_id = currUserIds.join(',');
+    if (currExcludedUserIds.length > 0) queryObj.not_user_id = currExcludedUserIds.join(',');
+
+    return queryObj;
+  }
+
+  makeIdentUsersQuery = () => {
+    const queryObj = {};
+    const currIdentUserIds = this.state.selectedIdentUsers.map(user => user.id);
+
+    if (currIdentUserIds.length > 0) queryObj.ident_user_id = currIdentUserIds.join(',');
+
+    return queryObj;
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (this.shouldUpdate(prevProps, prevState)) {
-      const currTaxonIds = this.state.selectedSpecies.map(taxon => taxon.id);
-      const currExcludedTaxonIds = this.state.excludedSpecies.map(taxon => taxon.id);
-
-      const currPlaceIds = this.state.selectedPlaces.map(place => place.id);
-      const currExcludedPlaceIds = this.state.excludedPlaces.map(place => place.id);
-
-      const currUserIds = this.state.selectedUsers.map(user => user.id);
-      const currExcludedUserIds = this.state.excludedUsers.map(user => user.id);
-
-      const queryObj = {};
-
-      if (currTaxonIds.length > 0) queryObj.taxon_ids = currTaxonIds.join(',');
-      if (currExcludedTaxonIds.length > 0) queryObj.without_taxon_id = currExcludedTaxonIds.join(',');
-
-      if (currPlaceIds.length > 0) queryObj.place_id = currPlaceIds.join(',');
-      if (currExcludedPlaceIds.length > 0) queryObj.not_in_place = currExcludedPlaceIds.join(',');
-
-      if (currUserIds.length > 0) queryObj.user_id = currUserIds.join(',');
-      if (currExcludedUserIds.length > 0) queryObj.not_user_id = currExcludedUserIds.join(',');
+      const queryObj = {
+        ...this.makeTaxaQuery(),
+        ...this.makePlacesQuery(),
+        ...this.makeUsersQuery(),
+        ...this.makeIdentUsersQuery(),
+      };
 
       if (this.state.page !== 1) queryObj.page = this.state.page;
 
@@ -387,6 +457,11 @@ class SearchDisplay extends Component {
           excludedUsers={this.state.excludedUsers}
           usersValue={this.state.usersInputValue}
           usersMatch={this.state.usersMatch}
+          handleIdentUsersChange={this.handleIdentUsersChange}
+          handleIdentUsersSelect={this.handleIdentUsersSelect}
+          selectedIdentUsers={this.state.selectedIdentUsers}
+          identUsersValue={this.state.identUsersInputValue}
+          identUsersMatch={this.state.identUsersMatch}
         />
         <SearchResults
           results={this.state.results}

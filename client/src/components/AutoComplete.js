@@ -85,6 +85,9 @@ class AutoComplete extends Component {
 
     this.handleUsersSelect = this.handleUsersSelect.bind(this);
     this.displayUsers = this.displayUsers.bind(this);
+
+    this.handleIdentUsersSelect = this.handleIdentUsersSelect.bind(this);
+    this.displayIdentUsers = this.displayIdentUsers.bind(this);
   }
 
   static propTypes= {
@@ -93,6 +96,7 @@ class AutoComplete extends Component {
     handleSpeciesSelect: PropTypes.func,
     handlePlacesSelect: PropTypes.func,
     handleUsersSelect: PropTypes.func,
+    handleIdentUsersSelect: PropTypes.func,
   };
 
   handleSpeciesSelect = (species, exclude) => {
@@ -221,6 +225,50 @@ class AutoComplete extends Component {
     );
   });
 
+  handleIdentUsersSelect = (user, exclude) => {
+    const selectedIdentUsers = {
+      id: user.id,
+      name: user.name,
+      login: user.login,
+    };
+    this.props.handleIdentUsersSelect(selectedIdentUsers, exclude);
+  }
+
+  displayIdentUsers = () => this.props.matches.map((user) => {
+    let photoElem;
+    if (user.icon) {
+      photoElem = <PhotoImg
+        src={user.icon}
+        alt={user.login}
+      />;
+    } else {
+      photoElem = '';
+    }
+
+    return (
+      <li key={user.id} data-id={user.id}>
+          <MatchItem>
+            <Row>
+              <Col xs={12} className="trimText">
+                <IncludeMatchItem onClick={() => this.handleIdentUsersSelect(user, false)}>
+                  <PhotoDiv>
+                    {photoElem}
+                  </PhotoDiv>
+                  <Names>
+                    <CommonName>{user.name}</CommonName>
+                    <Latin>
+                      <LatinName>{user.login}</LatinName>
+                    </Latin>
+                  </Names>
+                </IncludeMatchItem>
+              </Col>
+            </Row>
+          </MatchItem>
+      </li>
+    );
+  });
+
+
   render() {
     let matchesList;
     if (this.props.type === 'species') {
@@ -229,6 +277,8 @@ class AutoComplete extends Component {
       matchesList = this.displayPlaces();
     } else if (this.props.type === 'users') {
       matchesList = this.displayUsers();
+    } else if (this.props.type === 'identUsers') {
+      matchesList = this.displayIdentUsers();
     }
 
     return (

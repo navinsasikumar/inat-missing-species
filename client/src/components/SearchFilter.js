@@ -52,6 +52,11 @@ class SearchFilter extends Component {
     usersMatch: PropTypes.array.isRequired,
     selectedUsers: PropTypes.array.isRequired,
     usersValue: PropTypes.string,
+    handleIdentUsersChange: PropTypes.func.isRequired,
+    handleIdentUsersSelect: PropTypes.func.isRequired,
+    identUsersMatch: PropTypes.array.isRequired,
+    selectedIdentUsers: PropTypes.array.isRequired,
+    identUsersValue: PropTypes.string,
   };
 
   render() {
@@ -63,6 +68,8 @@ class SearchFilter extends Component {
 
     const selectedUsersLabel = this.props.selectedUsers.length > 0 ? 'Selected Users: ' : '';
     const excludedUsersLabel = this.props.excludedUsers.length > 0 ? 'Excluded Users: ' : '';
+
+    const selectedIdentUsersLabel = this.props.selectedIdentUsers.length > 0 ? 'Selected Users: ' : '';
 
     return (
       <SearchFilterWrapper>
@@ -162,7 +169,20 @@ class SearchFilter extends Component {
             </Col>
             <Col xs={12} md={6}>
               <FormGroup>
-                <Form.Control size="sm" type="text" placeholder="Identifying User" onChange={this.props.handlePlacesChange} value={this.props.placesValue} />
+                <Form.Control size="sm" type="text" placeholder="Identifying User" onChange={this.props.handleIdentUsersChange} value={this.props.identUsersValue} />
+                <AutoComplete type="identUsers" matches={this.props.identUsersMatch} handleIdentUsersSelect={this.props.handleIdentUsersSelect}/>
+                <MultiSelected>
+                  {selectedIdentUsersLabel}
+                  {this.props.selectedIdentUsers.map((user, index) => (
+                    <SelectedFilters
+                      key={user.id}
+                      selectedIndex={index}
+                      selectedValue={user}
+                      selectedType="identUsers"
+                      handleSelectedClick={this.props.handleSelectedClick}
+                    />
+                  ))}
+                </MultiSelected>
               </FormGroup>
             </Col>
           </Row>
