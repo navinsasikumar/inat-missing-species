@@ -75,9 +75,8 @@ const autocompleteUsers = async (req, res) => {
 const autocompleteObservationFields = async (req, res) => {
   try {
     const obsFields = new ObservationFields(10);
-    console.log(req.query);
     const results = await obsFields.autocomplete(req.query.search);
-    return res.send(results);
+    return res.send({ results });
   } catch (e) {
     console.error(e);
     return res.send({ results: [] });

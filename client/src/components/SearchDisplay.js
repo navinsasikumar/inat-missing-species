@@ -32,6 +32,9 @@ class SearchDisplay extends Component {
     this.handleIdentUsersChange = this.handleIdentUsersChange.bind(this);
     this.handleIdentUsersSelect = this.handleIdentUsersSelect.bind(this);
 
+    this.handleObsFieldTermChange = this.handleObsFieldTermChange.bind(this);
+    this.handleObsFieldTermSelect = this.handleObsFieldTermSelect.bind(this);
+
     this.handleSelectedClick = this.handleSelectedClick.bind(this);
     this.handleCheckbox = this.handleCheckbox.bind(this);
     this.handlePageClick = this.handlePageClick.bind(this);
@@ -60,6 +63,10 @@ class SearchDisplay extends Component {
       identUsersInputValue: '',
       identUsersMatch: [],
       checkboxes: {},
+      selectedObsFieldTerm: [],
+      excludedObsFieldTerm: [],
+      obsFieldTermValue: '',
+      obsFieldTermMatch: [],
     };
   }
 
@@ -142,6 +149,12 @@ class SearchDisplay extends Component {
         };
       }
     }
+
+    // if (query.indexOf('field')) {
+    //   TODO Field
+    // }
+
+    // const obsFields = Object.keys(query).filter(key => key.startsWith('field'));
 
     if (query.page) {
       newState.page = Number(query.page);
@@ -274,6 +287,33 @@ class SearchDisplay extends Component {
     }
   }
 
+
+  handleObsFieldTermChange(event) {
+    const searchStr = event.target.value;
+    this.setState({ obsFieldTermValue: searchStr });
+    const url = `/api/observation_fields/autocomplete?search=${searchStr}`;
+    this.callApi(url)
+      .then(res => this.setState({ obsFieldTermMatch: res.results }))
+      .catch(e => this.setState({ errors: e }));
+  }
+
+  handleObsFieldTermSelect(selectedObsFieldTerm, exclude = false) {
+    console.log(selectedObsFieldTerm);
+    if (exclude === false) {
+      this.setState(prevState => ({
+        selectedObsFieldTerm: [...prevState.selectedObsFieldTerm, selectedObsFieldTerm],
+        obsFieldTermValue: selectedObsFieldTerm.name,
+        obsFieldTermMatch: [],
+      }));
+    } else {
+      this.setState(prevState => ({
+        excludedObsFieldTerm: [...prevState.excludedObsFieldTerm, selectedObsFieldTerm],
+        obsFieldTermValue: '',
+        obsFieldTermMatch: [],
+      }));
+    }
+  }
+
   handleCheckbox = (e, clickedType) => {
     let type = clickedType;
     if (clickedType === 'research' || clickedType === 'needs_id' || clickedType === 'casual') {
@@ -339,6 +379,7 @@ class SearchDisplay extends Component {
         this.setState({ selectedIdentUsers });
         break;
       }
+      // TODO Field
       default:
     }
   }
@@ -565,6 +606,12 @@ class SearchDisplay extends Component {
           identUsersMatch={this.state.identUsersMatch}
           checkboxes={this.state.checkboxes}
           handleCheckbox={this.handleCheckbox}
+          handleObsFieldTermChange={this.handleObsFieldTermChange}
+          handleObsFieldTermSelect={this.handleObsFieldTermSelect}
+          selectedObsFieldTerm={this.state.selectedObsFieldTerm}
+          excludedObsFieldTerm={this.state.excludedObsFieldTerm}
+          obsFieldTermValue={this.state.obsFieldTermValue}
+          obsFieldTermMatch={this.state.obsFieldTermMatch}
         />
         <SearchResults
           results={this.state.results}

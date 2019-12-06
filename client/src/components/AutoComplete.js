@@ -97,6 +97,7 @@ class AutoComplete extends Component {
     handlePlacesSelect: PropTypes.func,
     handleUsersSelect: PropTypes.func,
     handleIdentUsersSelect: PropTypes.func,
+    handleObsFieldTermSelect: PropTypes.func,
   };
 
   handleSpeciesSelect = (species, exclude) => {
@@ -268,6 +269,41 @@ class AutoComplete extends Component {
     );
   });
 
+  handleObsFieldTermSelect = (obsFieldTerm, exclude) => {
+    const selectedObsFieldTerm = {
+      id: obsFieldTerm.id,
+      name: obsFieldTerm.name,
+      datatype: obsFieldTerm.datatype,
+      allowedValues: obsFieldTerm.allowed_values,
+      usageCount: obsFieldTerm.values_count,
+    };
+    this.props.handleObsFieldTermSelect(selectedObsFieldTerm, exclude);
+  }
+
+  displayObsFieldTerm = () => this.props.matches.map(obsFieldTerm => (
+    <li key={obsFieldTerm.id} data-id={obsFieldTerm.id}>
+        <MatchItem>
+          <Row>
+            <Col xs={9} className="trimText">
+              <IncludeMatchItem onClick={() => this.handleObsFieldTermSelect(obsFieldTerm, false)}>
+                <Names>
+                  <CommonName>{obsFieldTerm.name}</CommonName>
+                  <Latin>
+                    <LatinName>{obsFieldTerm.datatype}</LatinName>
+                  </Latin>
+                </Names>
+              </IncludeMatchItem>
+            </Col>
+            <Col xs={3} className="autocomplete-exclude-matches">
+              <ExcludeMatchItem onClick={() => this.handleObsFieldTermSelect(obsFieldTerm, true)}>
+                Exclude
+              </ExcludeMatchItem>
+            </Col>
+          </Row>
+        </MatchItem>
+    </li>
+  ));
+
 
   render() {
     let matchesList;
@@ -279,6 +315,8 @@ class AutoComplete extends Component {
       matchesList = this.displayUsers();
     } else if (this.props.type === 'identUsers') {
       matchesList = this.displayIdentUsers();
+    } else if (this.props.type === 'obsFieldTerm') {
+      matchesList = this.displayObsFieldTerm();
     }
 
     return (

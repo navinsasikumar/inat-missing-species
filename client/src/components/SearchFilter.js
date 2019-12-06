@@ -31,6 +31,11 @@ const MultiSelected = styled.div`
   }
 `;
 
+const CheckboxesWrapper = styled.div`
+  font-size: 75%;
+  padding: 10px 0;
+`;
+
 class SearchFilter extends Component {
   static propTypes= {
     handleSelectedClick: PropTypes.func.isRequired,
@@ -59,6 +64,11 @@ class SearchFilter extends Component {
     identUsersValue: PropTypes.string,
     checkboxes: PropTypes.object,
     handleCheckbox: PropTypes.func.isRequired,
+    handleObsFieldTermChange: PropTypes.func.isRequired,
+    handleObsFieldTermSelect: PropTypes.func.isRequired,
+    obsFieldTermMatch: PropTypes.array.isRequired,
+    selectedObsFieldTerm: PropTypes.array.isRequired,
+    obsFieldTermValue: PropTypes.string,
   };
 
   render() {
@@ -72,6 +82,29 @@ class SearchFilter extends Component {
     const excludedUsersLabel = this.props.excludedUsers.length > 0 ? 'Excluded Users: ' : '';
 
     const selectedIdentUsersLabel = this.props.selectedIdentUsers.length > 0 ? 'Selected Users: ' : '';
+
+    const obsFieldTermObj = this.props.selectedObsFieldTerm.filter(e => e.name === this.props.obsFieldTermValue)[0];
+    console.log(obsFieldTermObj);
+    let obsFieldValueInput = <Form.Control size="sm" type="text" placeholder="Observation Field Value" onChange={this.props.handleObsFieldValueChange} value={this.props.obsFieldValue} />
+    if (obsFieldTermObj) {
+      if (obsFieldTermObj.datatype === 'text' && obsFieldTermObj.allowedValues) {
+        const allowedValues = obsFieldTermObj.allowedValues.split('|');
+        console.log(allowedValues);
+        const selectOpts = allowedValues.map(val => <option key={`${obsFieldTermObj.id}-{val}`}>{val}</option>);
+        obsFieldValueInput = (
+          <Form.Control as="select" size="sm">
+            <option selected disabled>Select...</option>
+            {selectOpts}
+          </Form.Control>
+        );
+      } else if (obsFieldTermObj.datatype === 'taxon') {
+        // TODO Show species selection field here
+      } else if (obsFieldTermObj.datatype === 'date') {
+        // TODO Show date selector here
+      } else if (obsFieldTermObj.datatype === 'numeric') {
+        // TODO Enforce numeric values
+      }
+    }
 
     return (
       <SearchFilterWrapper>
@@ -189,21 +222,43 @@ class SearchFilter extends Component {
             </Col>
           </Row>
           <Row>
+            <Col xs={4} md={2}>
+              <Form.Control as="select" size="sm">
+                <option selected disabled>Annotations</option>
+                <option>Life Stage</option>
+                <option>Sex</option>
+                <option>Plant Phenology</option>
+              </Form.Control>
+            </Col>
+            <Col xs={8} md={4}>
+                <Form.Control size="sm" type="text" placeholder="Annotation Value" onChange={this.props.handleAnnotationValueChange} value={this.props.annotationValue} />
+            </Col>
+            <Col xs={6} md={3}>
+                <Form.Control size="sm" type="text" placeholder="Observation Field" onChange={this.props.handleObsFieldTermChange} value={this.props.obsFieldTermValue} />
+                <AutoComplete type="obsFieldTerm" matches={this.props.obsFieldTermMatch} handleObsFieldTermSelect={this.props.handleObsFieldTermSelect}/>
+            </Col>
+            <Col xs={6} md={3}>
+                {obsFieldValueInput}
+            </Col>
+          </Row>
+          <Row>
             <Col>
-              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'captive')} id="captive-check" label="Captive" checked={this.props.checkboxes && (this.props.checkboxes.captive === 'true' || this.props.checkboxes.captive === 'any')} />
-              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'wild')} id="wild-check" label="Wild" checked={this.props.checkboxes && (this.props.checkboxes.captive === 'false' || this.props.checkboxes.wild === 'true' || this.props.checkboxes.captive === 'any')} />
-              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'native')} id="native-check" label="Native" />
-              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'introduced')} id="introduced-check" label="Introduced" />
-              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'outOfRange')} id="oor-check" label="Out of Range" />
-              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'threatened')} id="threatened-check" label="Threatened" />
-              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'endemic')} id="endemic-check" label="Endemic" />
-              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'verifiable')} id="verifiable-check" label="Verifiable" />
-              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'research')} id="rg-check" label="Research Grade" checked={this.props.checkboxes && (this.props.checkboxes.qualityGrade === 'research')} />
-              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'needs_id')} id="needs-id-check" label="Needs ID" checked={this.props.checkboxes && (this.props.checkboxes.qualityGrade === 'needs_id')} />
-              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'casual')} id="casual-check" label="Casual" checked={this.props.checkboxes && (this.props.checkboxes.qualityGrade === 'casual')} />
-              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'hasPhotos')} id="photos-check" label="Has Photos" />
-              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'hasSounds')} id="sounds-check" label="Has Sounds" />
-              <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'popular')} id="popular-check" label="Popular" />
+              <CheckboxesWrapper>
+                <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'captive')} id="captive-check" label="Captive" checked={this.props.checkboxes && (this.props.checkboxes.captive === 'true' || this.props.checkboxes.captive === 'any')} />
+                <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'wild')} id="wild-check" label="Wild" checked={this.props.checkboxes && (this.props.checkboxes.captive === 'false' || this.props.checkboxes.wild === 'true' || this.props.checkboxes.captive === 'any')} />
+                <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'native')} id="native-check" label="Native" />
+                <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'introduced')} id="introduced-check" label="Introduced" />
+                <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'outOfRange')} id="oor-check" label="Out of Range" />
+                <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'threatened')} id="threatened-check" label="Threatened" />
+                <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'endemic')} id="endemic-check" label="Endemic" />
+                <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'verifiable')} id="verifiable-check" label="Verifiable" />
+                <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'research')} id="rg-check" label="Research Grade" checked={this.props.checkboxes && (this.props.checkboxes.qualityGrade === 'research')} />
+                <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'needs_id')} id="needs-id-check" label="Needs ID" checked={this.props.checkboxes && (this.props.checkboxes.qualityGrade === 'needs_id')} />
+                <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'casual')} id="casual-check" label="Casual" checked={this.props.checkboxes && (this.props.checkboxes.qualityGrade === 'casual')} />
+                <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'hasPhotos')} id="photos-check" label="Has Photos" />
+                <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'hasSounds')} id="sounds-check" label="Has Sounds" />
+                <Form.Check inline size="sm" type="checkbox" onChange={e => this.props.handleCheckbox(e, 'popular')} id="popular-check" label="Popular" />
+              </CheckboxesWrapper>
             </Col>
           </Row>
         </Form>
