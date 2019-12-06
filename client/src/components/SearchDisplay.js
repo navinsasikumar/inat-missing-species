@@ -35,6 +35,8 @@ class SearchDisplay extends Component {
     this.handleObsFieldTermChange = this.handleObsFieldTermChange.bind(this);
     this.handleObsFieldTermSelect = this.handleObsFieldTermSelect.bind(this);
 
+    this.handleObsFieldValueChange = this.handleObsFieldValueChange.bind(this);
+
     this.handleSelectedClick = this.handleSelectedClick.bind(this);
     this.handleCheckbox = this.handleCheckbox.bind(this);
     this.handlePageClick = this.handlePageClick.bind(this);
@@ -64,6 +66,7 @@ class SearchDisplay extends Component {
       identUsersMatch: [],
       checkboxes: {},
       selectedObsFieldTerm: [],
+      currentlySelectedObsTerm: '',
       excludedObsFieldTerm: [],
       obsFieldTermValue: '',
       obsFieldTermMatch: [],
@@ -300,7 +303,8 @@ class SearchDisplay extends Component {
     if (exclude === false) {
       this.setState(prevState => ({
         selectedObsFieldTerm: [...prevState.selectedObsFieldTerm, selectedObsFieldTerm],
-        obsFieldTermValue: selectedObsFieldTerm.name,
+        obsFieldTermValue: '',
+        currentlySelectedObsTerm: selectedObsFieldTerm.name,
         obsFieldTermMatch: [],
       }));
     } else {
@@ -310,6 +314,11 @@ class SearchDisplay extends Component {
         obsFieldTermMatch: [],
       }));
     }
+  }
+
+  handleObsFieldValueChange(event) {
+    console.log(event.target.value);
+    this.setState({ currentlySelectedObsTerm: '' });
   }
 
   handleCheckbox = (e, clickedType) => {
@@ -630,8 +639,10 @@ class SearchDisplay extends Component {
           handleObsFieldTermSelect={this.handleObsFieldTermSelect}
           selectedObsFieldTerm={this.state.selectedObsFieldTerm}
           excludedObsFieldTerm={this.state.excludedObsFieldTerm}
+          currentlySelectedObsTerm={this.state.currentlySelectedObsTerm}
           obsFieldTermValue={this.state.obsFieldTermValue}
           obsFieldTermMatch={this.state.obsFieldTermMatch}
+          handleObsFieldValueChange={this.handleObsFieldValueChange}
         />
         <SearchResults
           results={this.state.results}

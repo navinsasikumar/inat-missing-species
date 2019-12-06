@@ -69,8 +69,39 @@ class SearchFilter extends Component {
     handleObsFieldTermSelect: PropTypes.func.isRequired,
     obsFieldTermMatch: PropTypes.array.isRequired,
     selectedObsFieldTerm: PropTypes.array.isRequired,
+    currentlySelectedObsTerm: PropTypes.string.isRequired,
     obsFieldTermValue: PropTypes.string,
+    handleObsFieldValueChange: PropTypes.func.isRequired,
+    obsFieldValue: PropTypes.string,
+    handleAnnotationValueChange: PropTypes.func.isRequired,
+    annotationValue: PropTypes.string,
   };
+
+  createObsFieldValueElem = () => {
+    const obsFieldTermObj = this.props.selectedObsFieldTerm
+      .filter(e => e.name === this.props.currentlySelectedObsTerm)[0];
+    let obsFieldValueInput = <Form.Control size="sm" type="text" placeholder="Observation Field Value" onChange={this.props.handleObsFieldValueChange} value={this.props.obsFieldValue} />;
+    if (obsFieldTermObj) {
+      if (obsFieldTermObj.datatype === 'text' && obsFieldTermObj.allowedValues) {
+        const allowedValues = obsFieldTermObj.allowedValues.split('|');
+        const selectOpts = allowedValues.map(val => <option key={`${obsFieldTermObj.id}-${val}`} value={val}>{val}</option>);
+        obsFieldValueInput = (
+          <Form.Control as="select" size="sm" onChange={this.props.handleObsFieldValueChange}>
+            <option selected disabled>Select {obsFieldTermObj.name}</option>
+            <option value="any">Any</option>
+            {selectOpts}
+          </Form.Control>
+        );
+      } else if (obsFieldTermObj.datatype === 'taxon') {
+        // TODO Show species selection field here
+      } else if (obsFieldTermObj.datatype === 'date') {
+        // TODO Show date selector here
+      } else if (obsFieldTermObj.datatype === 'numeric') {
+        // TODO Enforce numeric values
+      }
+    }
+    return obsFieldValueInput;
+  }
 
   render() {
     const selectedSpeciesLabel = this.props.selectedSpecies.length > 0 ? 'Selected Taxa: ' : '';
@@ -86,26 +117,7 @@ class SearchFilter extends Component {
 
     const selectedObsTermLabel = this.props.selectedObsFieldTerm.length > 0 ? 'Selected Terms: ' : '';
 
-    const obsFieldTermObj = this.props.selectedObsFieldTerm.filter(e => e.name === this.props.obsFieldTermValue)[0];
-    let obsFieldValueInput = <Form.Control size="sm" type="text" placeholder="Observation Field Value" onChange={this.props.handleObsFieldValueChange} value={this.props.obsFieldValue} />
-    if (obsFieldTermObj) {
-      if (obsFieldTermObj.datatype === 'text' && obsFieldTermObj.allowedValues) {
-        const allowedValues = obsFieldTermObj.allowedValues.split('|');
-        const selectOpts = allowedValues.map(val => <option key={`${obsFieldTermObj.id}-${val}`}>{val}</option>);
-        obsFieldValueInput = (
-          <Form.Control as="select" size="sm">
-            <option selected disabled>Select...</option>
-            {selectOpts}
-          </Form.Control>
-        );
-      } else if (obsFieldTermObj.datatype === 'taxon') {
-        // TODO Show species selection field here
-      } else if (obsFieldTermObj.datatype === 'date') {
-        // TODO Show date selector here
-      } else if (obsFieldTermObj.datatype === 'numeric') {
-        // TODO Enforce numeric values
-      }
-    }
+    const obsFieldValueInput = this.createObsFieldValueElem();
 
     return (
       <SearchFilterWrapper>
