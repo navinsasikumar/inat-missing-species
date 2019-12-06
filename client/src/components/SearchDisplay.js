@@ -378,6 +378,12 @@ class SearchDisplay extends Component {
         break;
       }
       // TODO Field
+      case 'obsTerm': {
+        const selectedObsFieldTerm = [...this.state.selectedObsFieldTerm];
+        selectedObsFieldTerm.splice(index, 1);
+        this.setState({ selectedObsFieldTerm });
+        break;
+      }
       default:
     }
   }
