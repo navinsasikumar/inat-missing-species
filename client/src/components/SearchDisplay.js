@@ -150,11 +150,9 @@ class SearchDisplay extends Component {
       }
     }
 
-    // if (query.indexOf('field')) {
-    //   TODO Field
-    // }
-
-    // const obsFields = Object.keys(query).filter(key => key.startsWith('field'));
+    const obsFields = Object.keys(query).filter(key => key.startsWith('field'))
+      .map(e => e.substring('field:'.length));
+    newState.selectedObsFieldTerm = obsFields.map(e => ({ name: e }));
 
     if (query.page) {
       newState.page = Number(query.page);
@@ -416,6 +414,9 @@ class SearchDisplay extends Component {
     const prevIdentUserIds = prevState.selectedIdentUsers.map(user => user.id);
     const currIdentUserIds = this.state.selectedIdentUsers.map(user => user.id);
 
+    const prevObsFieldTermIds = prevState.selectedObsFieldTerm.map(term => term.id);
+    const currObsFieldTermIds = this.state.selectedObsFieldTerm.map(user => user.id);
+
     return !this.isEqualArrays(prevTaxonIds, currTaxonIds)
       || !this.isEqualArrays(prevExcludedTaxonIds, currExcludedTaxonIds)
       || !this.isEqualArrays(prevPlaceIds, currPlaceIds)
@@ -423,6 +424,7 @@ class SearchDisplay extends Component {
       || !this.isEqualArrays(prevUserIds, currUserIds)
       || !this.isEqualArrays(prevExcludedUserIds, currExcludedUserIds)
       || !this.isEqualArrays(prevIdentUserIds, currIdentUserIds)
+      || !this.isEqualArrays(prevObsFieldTermIds, currObsFieldTermIds)
       || JSON.stringify(prevState.checkboxes) !== JSON.stringify(this.state.checkboxes)
       || prevState.page !== this.state.page;
   }
@@ -466,6 +468,15 @@ class SearchDisplay extends Component {
 
     if (currIdentUserIds.length > 0) queryObj.ident_user_id = currIdentUserIds.join(',');
 
+    return queryObj;
+  }
+
+  makeObsFieldQuery = () => {
+    const queryObj = {};
+    this.state.selectedObsFieldTerm.map(term => `field:${term.name}`)
+      .forEach((e) => { queryObj[e] = null; });
+
+    console.log(queryObj);
     return queryObj;
   }
 
@@ -544,11 +555,14 @@ class SearchDisplay extends Component {
         ...this.makeUsersQuery(),
         ...this.makeIdentUsersQuery(),
         ...this.makeCheckboxesQuery(),
+        ...this.makeObsFieldQuery(),
       };
 
       if (this.state.page !== 1) queryObj.page = this.state.page;
 
       const queryStr = queryString.stringify(queryObj);
+      console.log(queryObj);
+      console.log(queryStr);
       const url = queryStr ? `/api/observations?${queryStr}` : '/api/observations';
 
       this.setState({ loading: true, queryStr }, () => {

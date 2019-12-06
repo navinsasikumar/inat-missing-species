@@ -19,6 +19,7 @@ const SearchFilterWrapper = styled.div`
 
 const FormGroup = styled.div`
   position: relative;
+  padding-bottom: 10px;
 `;
 
 const MultiSelected = styled.div`
@@ -83,14 +84,14 @@ class SearchFilter extends Component {
 
     const selectedIdentUsersLabel = this.props.selectedIdentUsers.length > 0 ? 'Selected Users: ' : '';
 
+    const selectedObsTermLabel = this.props.selectedObsFieldTerm.length > 0 ? 'Selected Terms: ' : '';
+
     const obsFieldTermObj = this.props.selectedObsFieldTerm.filter(e => e.name === this.props.obsFieldTermValue)[0];
-    console.log(obsFieldTermObj);
     let obsFieldValueInput = <Form.Control size="sm" type="text" placeholder="Observation Field Value" onChange={this.props.handleObsFieldValueChange} value={this.props.obsFieldValue} />
     if (obsFieldTermObj) {
       if (obsFieldTermObj.datatype === 'text' && obsFieldTermObj.allowedValues) {
         const allowedValues = obsFieldTermObj.allowedValues.split('|');
-        console.log(allowedValues);
-        const selectOpts = allowedValues.map(val => <option key={`${obsFieldTermObj.id}-{val}`}>{val}</option>);
+        const selectOpts = allowedValues.map(val => <option key={`${obsFieldTermObj.id}-${val}`}>{val}</option>);
         obsFieldValueInput = (
           <Form.Control as="select" size="sm">
             <option selected disabled>Select...</option>
@@ -233,12 +234,32 @@ class SearchFilter extends Component {
             <Col xs={8} md={4}>
                 <Form.Control size="sm" type="text" placeholder="Annotation Value" onChange={this.props.handleAnnotationValueChange} value={this.props.annotationValue} />
             </Col>
-            <Col xs={6} md={3}>
-                <Form.Control size="sm" type="text" placeholder="Observation Field" onChange={this.props.handleObsFieldTermChange} value={this.props.obsFieldTermValue} />
-                <AutoComplete type="obsFieldTerm" matches={this.props.obsFieldTermMatch} handleObsFieldTermSelect={this.props.handleObsFieldTermSelect}/>
-            </Col>
-            <Col xs={6} md={3}>
-                {obsFieldValueInput}
+            <Col xs={12} md={6}>
+              <Row>
+                <Col xs={6} md={6}>
+                    <Form.Control size="sm" type="text" placeholder="Observation Field" onChange={this.props.handleObsFieldTermChange} value={this.props.obsFieldTermValue} />
+                    <AutoComplete type="obsFieldTerm" matches={this.props.obsFieldTermMatch} handleObsFieldTermSelect={this.props.handleObsFieldTermSelect}/>
+                </Col>
+                <Col xs={6} md={6}>
+                    {obsFieldValueInput}
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                    <MultiSelected>
+                      {selectedObsTermLabel}
+                      {this.props.selectedObsFieldTerm.map((term, index) => (
+                        <SelectedFilters
+                          key={term.id}
+                          selectedIndex={index}
+                          selectedValue={term}
+                          selectedType="obsTerm"
+                          handleSelectedClick={this.props.handleSelectedClick}
+                        />
+                      ))}
+                    </MultiSelected>
+                </Col>
+              </Row>
             </Col>
           </Row>
           <Row>

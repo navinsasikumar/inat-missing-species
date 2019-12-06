@@ -44,6 +44,8 @@ class SelectedFilters extends Component {
       selectedDisplay = this.props.selectedValue.display;
     } else if (type === 'users' || type === 'usersExclude' || type === 'identUsers') {
       selectedDisplay = this.props.selectedValue.login;
+    } else if (type === 'obsTerm') {
+      selectedDisplay = this.props.selectedValue.name;
     }
 
     return (

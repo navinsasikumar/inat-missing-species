@@ -289,7 +289,7 @@ class AutoComplete extends Component {
                 <Names>
                   <CommonName>{obsFieldTerm.name}</CommonName>
                   <Latin>
-                    <LatinName>{obsFieldTerm.datatype}</LatinName>
+                    <LatinName>Type: {obsFieldTerm.datatype} (Used {obsFieldTerm.values_count} times)</LatinName>
                   </Latin>
                 </Names>
               </IncludeMatchItem>
