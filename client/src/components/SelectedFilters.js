@@ -46,6 +46,9 @@ class SelectedFilters extends Component {
       selectedDisplay = this.props.selectedValue.login;
     } else if (type === 'obsTerm') {
       selectedDisplay = this.props.selectedValue.name;
+      if (this.props.selectedValue.selectedValue) {
+        selectedDisplay += `=${this.props.selectedValue.selectedValue}`;
+      }
     }
 
     return (

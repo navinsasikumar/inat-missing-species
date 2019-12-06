@@ -155,7 +155,15 @@ class SearchDisplay extends Component {
 
     const obsFields = Object.keys(query).filter(key => key.startsWith('field'))
       .map(e => e.substring('field:'.length));
-    newState.selectedObsFieldTerm = obsFields.map(e => ({ name: e }));
+    newState.selectedObsFieldTerm = obsFields.map((e) => {
+      const obj = {
+        name: e,
+      };
+      if (query[`field:${e}`]) {
+        obj.selectedValue = query[`field:${e}`];
+      }
+      return obj;
+    });
 
     if (query.page) {
       newState.page = Number(query.page);
@@ -299,7 +307,6 @@ class SearchDisplay extends Component {
   }
 
   handleObsFieldTermSelect(selectedObsFieldTerm, exclude = false) {
-    console.log(selectedObsFieldTerm);
     if (exclude === false) {
       this.setState(prevState => ({
         selectedObsFieldTerm: [...prevState.selectedObsFieldTerm, selectedObsFieldTerm],
@@ -317,8 +324,19 @@ class SearchDisplay extends Component {
   }
 
   handleObsFieldValueChange(event) {
-    console.log(event.target.value);
-    this.setState({ currentlySelectedObsTerm: '' });
+    const selectedValue = event.target.value;
+    this.setState((prevState) => {
+      const matchedIndex = prevState.selectedObsFieldTerm
+        .findIndex(e => e.name === prevState.currentlySelectedObsTerm);
+      const newObsArr = [...prevState.selectedObsFieldTerm];
+      const matchedObjCopy = { ...newObsArr[matchedIndex] };
+      matchedObjCopy.selectedValue = selectedValue;
+      newObsArr[matchedIndex] = matchedObjCopy;
+      return {
+        currentlySelectedObsTerm: '',
+        selectedObsFieldTerm: newObsArr,
+      };
+    });
   }
 
   handleCheckbox = (e, clickedType) => {
@@ -430,7 +448,10 @@ class SearchDisplay extends Component {
     const currIdentUserIds = this.state.selectedIdentUsers.map(user => user.id);
 
     const prevObsFieldTermIds = prevState.selectedObsFieldTerm.map(term => term.id);
-    const currObsFieldTermIds = this.state.selectedObsFieldTerm.map(user => user.id);
+    const currObsFieldTermIds = this.state.selectedObsFieldTerm.map(term => term.id);
+
+    const prevObsFieldValueIds = prevState.selectedObsFieldTerm.map(term => term.selectedValue);
+    const currObsFieldValueIds = this.state.selectedObsFieldTerm.map(term => term.selectedValue);
 
     return !this.isEqualArrays(prevTaxonIds, currTaxonIds)
       || !this.isEqualArrays(prevExcludedTaxonIds, currExcludedTaxonIds)
@@ -440,6 +461,7 @@ class SearchDisplay extends Component {
       || !this.isEqualArrays(prevExcludedUserIds, currExcludedUserIds)
       || !this.isEqualArrays(prevIdentUserIds, currIdentUserIds)
       || !this.isEqualArrays(prevObsFieldTermIds, currObsFieldTermIds)
+      || !this.isEqualArrays(prevObsFieldValueIds, currObsFieldValueIds)
       || JSON.stringify(prevState.checkboxes) !== JSON.stringify(this.state.checkboxes)
       || prevState.page !== this.state.page;
   }
@@ -488,10 +510,9 @@ class SearchDisplay extends Component {
 
   makeObsFieldQuery = () => {
     const queryObj = {};
-    this.state.selectedObsFieldTerm.map(term => `field:${term.name}`)
-      .forEach((e) => { queryObj[e] = null; });
+    this.state.selectedObsFieldTerm.map(term => ({ field: `field:${term.name}`, value: term.selectedValue }))
+      .forEach((e) => { queryObj[e.field] = e.value || null; });
 
-    console.log(queryObj);
     return queryObj;
   }
 
@@ -576,8 +597,6 @@ class SearchDisplay extends Component {
       if (this.state.page !== 1) queryObj.page = this.state.page;
 
       const queryStr = queryString.stringify(queryObj);
-      console.log(queryObj);
-      console.log(queryStr);
       const url = queryStr ? `/api/observations?${queryStr}` : '/api/observations';
 
       this.setState({ loading: true, queryStr }, () => {
