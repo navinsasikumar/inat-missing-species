@@ -143,6 +143,7 @@ class SearchDisplay extends Component {
       newState.selectedIdentUsers = getIdentUsersRes.results.map(this.makeUserObj);
     }
 
+    /*
     if (query.captive) {
       if (newState.checkboxes && typeof newState.checkboxes === 'object') {
         newState.checkboxes.captive = query.captive;
@@ -151,7 +152,16 @@ class SearchDisplay extends Component {
           captive: query.captive,
         };
       }
+    } */
+
+    const checkboxFields = ['captive', 'native', 'endemic', 'threatened', 'out_of_range', 'introduced', 'verifiable', 'quality_grade', 'photos', 'sounds', 'popular'];
+    const checkboxQueries = Object.keys(query).filter(key => checkboxFields.includes(key));
+    if (!newState.checkboxes || typeof newState.checkboxes !== 'object') {
+      newState.checkboxes = {};
     }
+    checkboxQueries.forEach((key) => {
+      newState.checkboxes[key] = query[key];
+    });
 
     const obsFields = Object.keys(query).filter(key => key.startsWith('field'))
       .map(e => e.substring('field:'.length));
@@ -357,12 +367,12 @@ class SearchDisplay extends Component {
   handleCheckbox = (e, clickedType) => {
     let type = clickedType;
     if (clickedType === 'research' || clickedType === 'needs_id' || clickedType === 'casual') {
-      type = 'qualityGrade';
+      type = 'quality_grade';
     }
 
     if (e.target.checked === true) {
       const checkboxes = {};
-      checkboxes[type] = type === 'qualityGrade' ? clickedType : 'true';
+      checkboxes[type] = type === 'quality_grade' ? clickedType : 'true';
       this.setState(prevState => ({
         checkboxes: { ...prevState.checkboxes, ...checkboxes },
       }));
@@ -556,7 +566,7 @@ class SearchDisplay extends Component {
       queryObj.introduced = 'true';
     }
 
-    if (checkboxes.outOfRange) {
+    if (checkboxes.out_of_range) {
       queryObj.out_of_range = 'true';
     }
 
@@ -572,15 +582,15 @@ class SearchDisplay extends Component {
       queryObj.verifiable = 'true';
     }
 
-    if (checkboxes.qualityGrade) {
-      queryObj.quality_grade = checkboxes.qualityGrade;
+    if (checkboxes.quality_grade) {
+      queryObj.quality_grade = checkboxes.quality_grade;
     }
 
-    if (checkboxes.hasPhotos) {
+    if (checkboxes.photos) {
       queryObj.photos = 'true';
     }
 
-    if (checkboxes.hasSounds) {
+    if (checkboxes.sounds) {
       queryObj.sounds = 'true';
     }
 
