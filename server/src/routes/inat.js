@@ -4,6 +4,7 @@ const Places = require('../lib/Places');
 const Users = require('../lib/Users');
 const Observations = require('../lib/Observations');
 const ObservationFields = require('../lib/ObservationFields');
+const Annotations = require('../lib/Annotations');
 
 const speciesCounts = async (req, res) => {
   const diff = await myCounts.missingSpecies(req.query);
@@ -83,6 +84,17 @@ const autocompleteObservationFields = async (req, res) => {
   }
 };
 
+const getAnnotations = async (req, res) => {
+  try {
+    const annotations = new Annotations();
+    const results = await annotations.get();
+    return res.send(results);
+  } catch (e) {
+    console.error(e);
+    return res.send({ results: [] });
+  }
+};
+
 const getObservations = async (req, res) => {
   const observations = new Observations();
   const results = await observations.get(req.query);
@@ -98,5 +110,6 @@ module.exports = {
   getUsers,
   autocompleteUsers,
   autocompleteObservationFields,
+  getAnnotations,
   getObservations,
 };

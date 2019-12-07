@@ -41,6 +41,7 @@ app.get('/api/places/:ids', inatRoutes.getPlaces);
 app.get('/api/users/autocomplete', inatRoutes.autocompleteUsers);
 app.get('/api/observation_fields/autocomplete', inatRoutes.autocompleteObservationFields);
 app.get('/api/users/:ids', inatRoutes.getUsers);
+app.get('/api/annotations', inatRoutes.getAnnotations);
 
 // All remaining requests return the React app, so it can handle routing.
 app.get('*', function(request, response) {
