@@ -300,8 +300,11 @@ class SearchDisplay extends Component {
   handleObsFieldTermChange(event) {
     const searchStr = event.target.value;
     this.setState({ obsFieldTermValue: searchStr });
+    if (searchStr === '') {
+      return this.setState({ obsFieldTermMatch: [] });
+    }
     const url = `/api/observation_fields/autocomplete?search=${searchStr}`;
-    this.callApi(url)
+    return this.callApi(url)
       .then(res => this.setState({ obsFieldTermMatch: res.results }))
       .catch(e => this.setState({ errors: e }));
   }
