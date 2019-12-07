@@ -308,12 +308,24 @@ class SearchDisplay extends Component {
 
   handleObsFieldTermSelect(selectedObsFieldTerm, exclude = false) {
     if (exclude === false) {
-      this.setState(prevState => ({
-        selectedObsFieldTerm: [...prevState.selectedObsFieldTerm, selectedObsFieldTerm],
-        obsFieldTermValue: '',
-        currentlySelectedObsTerm: selectedObsFieldTerm.name,
-        obsFieldTermMatch: [],
-      }));
+      this.setState((prevState) => {
+        if (prevState.selectedObsFieldTerm.length > 0
+          && prevState.selectedObsFieldTerm
+            .findIndex(e => e.name === prevState.currentlySelectedObsTerm) < 0
+        ) {
+          return {
+            obsFieldTermValue: '',
+            currentlySelectedObsTerm: selectedObsFieldTerm.name,
+            obsFieldTermMatch: [],
+          };
+        }
+        return {
+          selectedObsFieldTerm: [...prevState.selectedObsFieldTerm, selectedObsFieldTerm],
+          obsFieldTermValue: '',
+          currentlySelectedObsTerm: selectedObsFieldTerm.name,
+          obsFieldTermMatch: [],
+        };
+      });
     } else {
       this.setState(prevState => ({
         excludedObsFieldTerm: [...prevState.excludedObsFieldTerm, selectedObsFieldTerm],
@@ -328,6 +340,10 @@ class SearchDisplay extends Component {
     this.setState((prevState) => {
       const matchedIndex = prevState.selectedObsFieldTerm
         .findIndex(e => e.name === prevState.currentlySelectedObsTerm);
+      console.log('Field value change');
+      console.log(matchedIndex);
+      console.log(prevState.selectedObsFieldTerm);
+      console.log(prevState.currentlySelectedObsTerm);
       const newObsArr = [...prevState.selectedObsFieldTerm];
       const matchedObjCopy = { ...newObsArr[matchedIndex] };
       matchedObjCopy.selectedValue = selectedValue;
