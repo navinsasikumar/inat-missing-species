@@ -12,7 +12,7 @@ import {
   Nav,
   NavDropdown,
 } from 'react-bootstrap';
-import { Switch, Route, Link } from 'react-router-dom';
+import { Switch, Route, Link, NavLink } from 'react-router-dom';
 import queryString from 'query-string';
 import Loader from 'react-loader-spinner';
 import SearchDisplay from './components/SearchDisplay';
@@ -48,13 +48,13 @@ class NavDropdownItem extends Component {
     if (this.props.city === 'host') {
       return (
         <span>
-          <span className="nav-item" data-effect="solid" data-tip={`Species seen in ${HOST_CITY} not yet observed during the CNC`}><Link to={`/?a_months=4,5&b_project_id=${HOST_PROJECT}`}>Home</Link></span><ReactTooltip />
+          <span className="nav-item" data-effect="solid" data-tip={`Species seen in ${HOST_CITY} not yet observed during the CNC`}>Home</span><ReactTooltip />
         </span>
       );
     } else if (this.props.city === 'search') {
       return (
         <span>
-          <span className="nav-item" data-effect="solid" data-tip={`Search Observations`}><Link to={`/search`}>Search</Link></span><ReactTooltip />
+          <span className="nav-item" data-effect="solid" data-tip={`Search Observations`}>Search</span><ReactTooltip />
         </span>
       );
     }
@@ -114,7 +114,7 @@ class HeaderBar extends Component {
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse className="justify-content-end" id="responsive-navbar-nav">
           <Nav className="justify-content-end">
-            <Navbar.Text><Nav.Link href="#home">
+            <Navbar.Text><Nav.Link as={NavLink} to={`/?a_months=4,5&b_project_id=${HOST_PROJECT}`} href="#home">
               <NavDropdownItem city="host" />
             </Nav.Link></Navbar.Text>
             <Navbar.Text>
@@ -129,7 +129,7 @@ class HeaderBar extends Component {
             <Navbar.Text>
               <NavDropdownItem city={COMPETE_CITY_4_NAME} project={COMPETE_CITY_4_PROJECT} place={COMPETE_CITY_4_PLACE} align="alignRight" />
             </Navbar.Text>
-            <Navbar.Text><Nav.Link href="#search">
+            <Navbar.Text><Nav.Link as={NavLink} to={`/search`} href="#search">
               <NavDropdownItem city="search" />
             </Nav.Link></Navbar.Text>
           </Nav>

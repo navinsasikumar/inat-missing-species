@@ -340,10 +340,6 @@ class SearchDisplay extends Component {
     this.setState((prevState) => {
       const matchedIndex = prevState.selectedObsFieldTerm
         .findIndex(e => e.name === prevState.currentlySelectedObsTerm);
-      console.log('Field value change');
-      console.log(matchedIndex);
-      console.log(prevState.selectedObsFieldTerm);
-      console.log(prevState.currentlySelectedObsTerm);
       const newObsArr = [...prevState.selectedObsFieldTerm];
       const matchedObjCopy = { ...newObsArr[matchedIndex] };
       matchedObjCopy.selectedValue = selectedValue;
@@ -435,8 +431,8 @@ class SearchDisplay extends Component {
     let page = data.selected + 1;
     if (page * this.state.perPage > 10000) {
       page = Math.floor(10000 / this.state.perPage);
-      console.log('iNat API limitation');
-      console.log(page);
+      console.log('iNat API limitation'); // eslint-disable-line no-console
+      console.log(page); // eslint-disable-line no-console
     }
     this.setState({ page });
   }
@@ -532,7 +528,7 @@ class SearchDisplay extends Component {
     return queryObj;
   }
 
-  makeCheckboxesQuery = () => { // TODO
+  makeCaptiveQuery = () => {
     const queryObj = {};
     const { checkboxes } = this.state;
     if (checkboxes.captive === 'true' && checkboxes.wild === 'true') {
@@ -542,6 +538,12 @@ class SearchDisplay extends Component {
     } else if (checkboxes.wild === 'true' || checkboxes.captive === 'false') {
       queryObj.captive = 'false';
     }
+    return queryObj;
+  }
+
+  makeCheckboxesQuery = () => {
+    const { checkboxes } = this.state;
+    const queryObj = this.makeCaptiveQuery();
 
     if (checkboxes.native) {
       queryObj.native = 'true';
@@ -566,19 +568,6 @@ class SearchDisplay extends Component {
     if (checkboxes.verifiable) {
       queryObj.verifiable = 'true';
     }
-
-    /*
-    if (checkboxes.researchGrade) {
-      queryObj.quality_grade = 'research';
-    }
-
-    if (checkboxes.needsId) {
-      queryObj.quality_grade = 'needs_id';
-    }
-
-    if (checkboxes.casual) {
-      queryObj.quality_grade = 'casual';
-    } */
 
     if (checkboxes.qualityGrade) {
       queryObj.quality_grade = checkboxes.qualityGrade;
