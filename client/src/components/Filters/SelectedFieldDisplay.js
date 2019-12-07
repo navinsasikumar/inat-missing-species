@@ -30,7 +30,7 @@ class SelectedFieldsDisplay extends Component {
         {this.props.selectedLabel}
         {this.props.selectedArray.map((item, index) => (
           <SelectedFilters
-            key={item.id}
+            key={`${this.props.selectedType}-${item.id}`}
             selectedIndex={index}
             selectedValue={item}
             selectedType={this.props.selectedType}
