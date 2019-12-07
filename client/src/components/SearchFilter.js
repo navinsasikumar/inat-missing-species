@@ -66,6 +66,7 @@ class SearchFilter extends Component {
     obsFieldTermValue: PropTypes.string,
     handleObsFieldValueChange: PropTypes.func.isRequired,
     obsFieldValue: PropTypes.string,
+    obsFieldValueMatch: PropTypes.array.isRequired,
     handleAnnotationValueChange: PropTypes.func.isRequired,
     annotationValue: PropTypes.string,
   };
@@ -130,7 +131,7 @@ class SearchFilter extends Component {
             </Col>
           </Row>
           <Row>
-            <Col xs={4} md={2}>
+            <Col xs={4} md={2} className="no-padding-right">
               <Form.Control as="select" size="sm">
                 <option selected disabled>Annotations</option>
                 <option>Life Stage</option>
@@ -152,6 +153,8 @@ class SearchFilter extends Component {
                   currentlySelectedObsTerm={this.props.currentlySelectedObsTerm}
                   handleObsFieldValueChange={this.props.handleObsFieldValueChange}
                   obsFieldValue={this.props.obsFieldValue}
+                  handleSpeciesChange={this.props.handleSpeciesChange}
+                  obsFieldValueMatch={this.props.obsFieldValueMatch}
                 />
             </Col>
           </Row>

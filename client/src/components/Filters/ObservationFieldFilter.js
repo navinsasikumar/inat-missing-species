@@ -22,6 +22,8 @@ class ObservationFieldFilter extends Component {
     obsFieldTermValue: PropTypes.string,
     handleObsFieldValueChange: PropTypes.func.isRequired,
     obsFieldValue: PropTypes.string,
+    handleSpeciesChange: PropTypes.func.isRequired,
+    obsFieldValueMatch: PropTypes.array.isRequired,
   };
 
   createObsFieldValueElem = () => {
@@ -35,12 +37,16 @@ class ObservationFieldFilter extends Component {
         obsFieldValueInput = (
           <Form.Control as="select" size="sm" onChange={this.props.handleObsFieldValueChange}>
             <option selected disabled>Select {obsFieldTermObj.name}</option>
-            <option value="any">Any</option>
             {selectOpts}
           </Form.Control>
         );
       } else if (obsFieldTermObj.datatype === 'taxon') {
-        // TODO Show species selection field here
+        obsFieldValueInput = (
+          <div>
+            <Form.Control size="sm" type="text" placeholder="Species" onChange={e => this.props.handleSpeciesChange(e, 'obsFieldValueMatch')} value={this.props.obsFieldValue} />
+            <AutoComplete type="species" matches={this.props.obsFieldValueMatch} handleSpeciesSelect={this.props.handleObsFieldValueChange} noExclude={true} />
+          </div>
+        );
       } else if (obsFieldTermObj.datatype === 'date') {
         // TODO Show date selector here
       } else if (obsFieldTermObj.datatype === 'numeric') {
@@ -57,7 +63,7 @@ class ObservationFieldFilter extends Component {
     return (
       <div>
         <Row>
-          <Col xs={6} md={6}>
+          <Col xs={6} md={6} className="no-padding-right">
               <Form.Control size="sm" type="text" placeholder="Observation Field" onChange={this.props.handleObsFieldTermChange} value={this.props.obsFieldTermValue} />
               <AutoComplete type="obsFieldTerm" matches={this.props.obsFieldTermMatch} handleObsFieldTermSelect={this.props.handleObsFieldTermSelect}/>
           </Col>

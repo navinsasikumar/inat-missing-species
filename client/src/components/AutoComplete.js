@@ -98,6 +98,7 @@ class AutoComplete extends Component {
     handleUsersSelect: PropTypes.func,
     handleIdentUsersSelect: PropTypes.func,
     handleObsFieldTermSelect: PropTypes.func,
+    noExclude: PropTypes.bool,
   };
 
   handleSpeciesSelect = (species, exclude) => {
@@ -119,12 +120,13 @@ class AutoComplete extends Component {
     } else {
       photoElem = '';
     }
+    const includeColLength = this.props.noExclude ? 12 : 9;
 
     return (
       <li key={species.id} data-id={species.id}>
           <MatchItem>
             <Row>
-              <Col xs={9} className="trimText">
+              <Col xs={includeColLength} className="trimText">
                 <IncludeMatchItem onClick={() => this.handleSpeciesSelect(species, false)}>
                   <PhotoDiv>
                     {photoElem}
@@ -137,11 +139,12 @@ class AutoComplete extends Component {
                   </Names>
                 </IncludeMatchItem>
               </Col>
-              <Col xs={3} className="autocomplete-exclude-matches">
-                <ExcludeMatchItem onClick={() => this.handleSpeciesSelect(species, true)}>
-                  Exclude
-                </ExcludeMatchItem>
-              </Col>
+              {this.props.noExclude !== true && <Col xs={3} className="autocomplete-exclude-matches">
+                  <ExcludeMatchItem onClick={() => this.handleSpeciesSelect(species, true)}>
+                    Exclude
+                  </ExcludeMatchItem>
+                </Col>
+              }
             </Row>
           </MatchItem>
       </li>
@@ -289,7 +292,9 @@ class AutoComplete extends Component {
                 <Names>
                   <CommonName>{obsFieldTerm.name}</CommonName>
                   <Latin>
-                    <LatinName>Type: {obsFieldTerm.datatype} (Used {obsFieldTerm.values_count} times)</LatinName>
+                    <LatinName>
+                      Type: {obsFieldTerm.datatype} (Used {obsFieldTerm.values_count} times)
+                    </LatinName>
                   </Latin>
                 </Names>
               </IncludeMatchItem>

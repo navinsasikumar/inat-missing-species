@@ -70,6 +70,7 @@ class SearchDisplay extends Component {
       excludedObsFieldTerm: [],
       obsFieldTermValue: '',
       obsFieldTermMatch: [],
+      obsFieldValueMatch: [],
     };
   }
 
@@ -143,17 +144,6 @@ class SearchDisplay extends Component {
       newState.selectedIdentUsers = getIdentUsersRes.results.map(this.makeUserObj);
     }
 
-    /*
-    if (query.captive) {
-      if (newState.checkboxes && typeof newState.checkboxes === 'object') {
-        newState.checkboxes.captive = query.captive;
-      } else {
-        newState.checkboxes = {
-          captive: query.captive,
-        };
-      }
-    } */
-
     const checkboxFields = ['captive', 'native', 'endemic', 'threatened', 'out_of_range', 'introduced', 'verifiable', 'quality_grade', 'photos', 'sounds', 'popular'];
     const checkboxQueries = Object.keys(query).filter(key => checkboxFields.includes(key));
     if (!newState.checkboxes || typeof newState.checkboxes !== 'object') {
@@ -209,12 +199,12 @@ class SearchDisplay extends Component {
   }
 
 
-  handleSpeciesChange(event) {
+  handleSpeciesChange(event, matches = 'speciesMatch') {
     const searchStr = event.target.value;
     this.setState({ speciesInputValue: searchStr });
     const url = `/api/taxa/autocomplete?search=${searchStr}`;
     this.callApi(url)
-      .then(res => this.setState({ speciesMatch: res.results }))
+      .then(res => this.setState({ [matches]: res.results }))
       .catch(e => this.setState({ errors: e }));
   }
 
@@ -324,7 +314,7 @@ class SearchDisplay extends Component {
       this.setState((prevState) => {
         if (prevState.selectedObsFieldTerm.length > 0
           && prevState.selectedObsFieldTerm
-            .findIndex(e => e.name === prevState.currentlySelectedObsTerm) < 0
+            .findIndex(e => e.name === selectedObsFieldTerm.name) >= 0
         ) {
           return {
             obsFieldTermValue: '',
@@ -348,8 +338,11 @@ class SearchDisplay extends Component {
     }
   }
 
-  handleObsFieldValueChange(event) {
-    const selectedValue = event.target.value;
+  handleObsFieldValueChange(selection) {
+    let selectedValue = selection;
+    if (selection.target && selection.target.value) { // For dropdown
+      selectedValue = selection.target.value;
+    }
     this.setState((prevState) => {
       const matchedIndex = prevState.selectedObsFieldTerm
         .findIndex(e => e.name === prevState.currentlySelectedObsTerm);
@@ -360,6 +353,7 @@ class SearchDisplay extends Component {
       return {
         currentlySelectedObsTerm: '',
         selectedObsFieldTerm: newObsArr,
+        obsFieldValueMatch: [],
       };
     });
   }
@@ -536,7 +530,7 @@ class SearchDisplay extends Component {
   makeObsFieldQuery = () => {
     const queryObj = {};
     this.state.selectedObsFieldTerm.map(term => ({ field: `field:${term.name}`, value: term.selectedValue }))
-      .forEach((e) => { queryObj[e.field] = e.value || null; });
+      .forEach((e) => { queryObj[e.field] = (typeof e.value === 'object' ? e.value.id : e.value) || null; });
 
     return queryObj;
   }
@@ -680,6 +674,7 @@ class SearchDisplay extends Component {
           obsFieldTermValue={this.state.obsFieldTermValue}
           obsFieldTermMatch={this.state.obsFieldTermMatch}
           handleObsFieldValueChange={this.handleObsFieldValueChange}
+          obsFieldValueMatch={this.state.obsFieldValueMatch}
         />
         <SearchResults
           results={this.state.results}
