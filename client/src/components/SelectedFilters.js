@@ -54,6 +54,8 @@ class SelectedFilters extends Component {
           selectedDisplay += `=${selectedValue}`;
         }
       }
+    } else if (type === 'annotationTerms' || type === 'annotationTermsExclude') {
+      selectedDisplay = this.props.selectedValue.label;
     }
 
     return (

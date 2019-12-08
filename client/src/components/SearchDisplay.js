@@ -34,8 +34,9 @@ class SearchDisplay extends Component {
 
     this.handleObsFieldTermChange = this.handleObsFieldTermChange.bind(this);
     this.handleObsFieldTermSelect = this.handleObsFieldTermSelect.bind(this);
-
     this.handleObsFieldValueChange = this.handleObsFieldValueChange.bind(this);
+
+    this.handleAnnotationTermSelect = this.handleAnnotationTermSelect.bind(this);
 
     this.handleSelectedClick = this.handleSelectedClick.bind(this);
     this.handleCheckbox = this.handleCheckbox.bind(this);
@@ -71,6 +72,10 @@ class SearchDisplay extends Component {
       obsFieldTermValue: '',
       obsFieldTermMatch: [],
       obsFieldValueMatch: [],
+      selectedAnnotations: [],
+      excludedAnnotations: [],
+      annotationsInputValue: '',
+      annotationsMatch: [],
     };
   }
 
@@ -107,6 +112,12 @@ class SearchDisplay extends Component {
       login: user.login,
     }
   )
+
+  makeAnnotationObj = (annotations, idStr) => {
+    const ids = idStr.split(',').map(id => Number(id));
+    if (!annotations.results) return [];
+    return annotations.results.filter(obj => ids.includes(obj.id));
+  }
 
   splitQueryStr = async (queryStr) => {
     const query = queryString.parse(queryStr);
@@ -164,6 +175,18 @@ class SearchDisplay extends Component {
       }
       return obj;
     });
+
+    if (query.term_id) {
+      const getAnnotationsRes = await this.callApi('/api/annotations');
+      newState.selectedAnnotations = this.makeAnnotationObj(getAnnotationsRes, query.term_id);
+    }
+    if (query.without_term_id) {
+      const getAnnotationsRes = await this.callApi('/api/annotations');
+      newState.excludedAnnotations = this.makeAnnotationObj(
+        getAnnotationsRes,
+        query.without_term_id,
+      );
+    }
 
     if (query.page) {
       newState.page = Number(query.page);
@@ -358,6 +381,22 @@ class SearchDisplay extends Component {
     });
   }
 
+  handleAnnotationTermSelect(selectedAnnotation, exclude = false) {
+    if (exclude === false) {
+      this.setState(prevState => ({
+        selectedAnnotations: [...prevState.selectedAnnotations, selectedAnnotation],
+        annotationsInputValue: '',
+        annotationsMatch: [],
+      }));
+    } else {
+      this.setState(prevState => ({
+        excludedAnnotations: [...prevState.excludedUsers, selectedAnnotation],
+        annotationsInputValue: '',
+        annotationsMatch: [],
+      }));
+    }
+  }
+
   handleCheckbox = (e, clickedType) => {
     let type = clickedType;
     if (clickedType === 'research' || clickedType === 'needs_id' || clickedType === 'casual') {
@@ -423,11 +462,22 @@ class SearchDisplay extends Component {
         this.setState({ selectedIdentUsers });
         break;
       }
-      // TODO Field
       case 'obsTerm': {
         const selectedObsFieldTerm = [...this.state.selectedObsFieldTerm];
         selectedObsFieldTerm.splice(index, 1);
         this.setState({ selectedObsFieldTerm });
+        break;
+      }
+      case 'annotationTerms': {
+        const selectedAnnotations = [...this.state.selectedAnnotations];
+        selectedAnnotations.splice(index, 1);
+        this.setState({ selectedAnnotations });
+        break;
+      }
+      case 'annotationTermsExclude': {
+        const excludedAnnotations = [...this.state.excludedAnnotations];
+        excludedAnnotations.splice(index, 1);
+        this.setState({ excludedAnnotations });
         break;
       }
       default:
@@ -472,6 +522,14 @@ class SearchDisplay extends Component {
     const prevObsFieldValueIds = prevState.selectedObsFieldTerm.map(term => term.selectedValue);
     const currObsFieldValueIds = this.state.selectedObsFieldTerm.map(term => term.selectedValue);
 
+    const prevAnnotationIds = prevState.selectedAnnotations.map(annotation => annotation.id);
+    const currAnnotationIds = this.state.selectedAnnotations.map(annotation => annotation.id);
+
+    const prevExcludedAnnotationIds = prevState.excludedAnnotations
+      .map(annotation => annotation.id);
+    const currExcludedAnnotationIds = this.state.excludedAnnotations
+      .map(annotation => annotation.id);
+
     return !this.isEqualArrays(prevTaxonIds, currTaxonIds)
       || !this.isEqualArrays(prevExcludedTaxonIds, currExcludedTaxonIds)
       || !this.isEqualArrays(prevPlaceIds, currPlaceIds)
@@ -481,6 +539,8 @@ class SearchDisplay extends Component {
       || !this.isEqualArrays(prevIdentUserIds, currIdentUserIds)
       || !this.isEqualArrays(prevObsFieldTermIds, currObsFieldTermIds)
       || !this.isEqualArrays(prevObsFieldValueIds, currObsFieldValueIds)
+      || !this.isEqualArrays(prevAnnotationIds, currAnnotationIds)
+      || !this.isEqualArrays(prevExcludedAnnotationIds, currExcludedAnnotationIds)
       || JSON.stringify(prevState.checkboxes) !== JSON.stringify(this.state.checkboxes)
       || prevState.page !== this.state.page;
   }
@@ -531,6 +591,18 @@ class SearchDisplay extends Component {
     const queryObj = {};
     this.state.selectedObsFieldTerm.map(term => ({ field: `field:${term.name}`, value: term.selectedValue }))
       .forEach((e) => { queryObj[e.field] = (typeof e.value === 'object' ? e.value.id : e.value) || null; });
+
+    return queryObj;
+  }
+
+  makeAnnotationsQuery = () => {
+    const queryObj = {};
+    const currAnnotationIds = this.state.selectedAnnotations.map(annotation => annotation.id);
+    const currExcludedAnnotationIds = this.state.excludedAnnotations
+      .map(annotation => annotation.id);
+
+    if (currAnnotationIds.length > 0) queryObj.term_id = currAnnotationIds.join(',');
+    if (currExcludedAnnotationIds.length > 0) queryObj.without_term_id = currExcludedAnnotationIds.join(',');
 
     return queryObj;
   }
@@ -604,6 +676,7 @@ class SearchDisplay extends Component {
         ...this.makeIdentUsersQuery(),
         ...this.makeCheckboxesQuery(),
         ...this.makeObsFieldQuery(),
+        ...this.makeAnnotationsQuery(),
       };
 
       if (this.state.page !== 1) queryObj.page = this.state.page;
@@ -675,6 +748,10 @@ class SearchDisplay extends Component {
           obsFieldTermMatch={this.state.obsFieldTermMatch}
           handleObsFieldValueChange={this.handleObsFieldValueChange}
           obsFieldValueMatch={this.state.obsFieldValueMatch}
+          handleAnnotationTermSelect={this.handleAnnotationTermSelect}
+          selectedAnnotations={this.state.selectedAnnotations}
+          excludedAnnotations={this.state.excludedAnnotations}
+          annotationsMatch={this.state.annotationsMatch}
         />
         <SearchResults
           results={this.state.results}

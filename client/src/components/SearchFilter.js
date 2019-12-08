@@ -15,6 +15,7 @@ import UsersFilter from './Filters/UsersFilter';
 import IdentUsersFilter from './Filters/IdentUsersFilter';
 import ObservationFieldFilter from './Filters/ObservationFieldFilter';
 import CheckboxesFilter from './Filters/CheckboxesFilter';
+import AnnotationsFilter from './Filters/AnnotationFilter';
 
 const SearchFilterWrapper = styled.div`
   padding: 10px;
@@ -67,6 +68,11 @@ class SearchFilter extends Component {
     handleObsFieldValueChange: PropTypes.func.isRequired,
     obsFieldValue: PropTypes.string,
     obsFieldValueMatch: PropTypes.array.isRequired,
+    handleAnnotationTermSelect: PropTypes.func.isRequired,
+    excludedAnnotations: PropTypes.array.isRequired,
+    annotationsMatch: PropTypes.array.isRequired,
+    selectedAnnotations: PropTypes.array.isRequired,
+    annotationsValue: PropTypes.string,
     handleAnnotationValueChange: PropTypes.func.isRequired,
     annotationValue: PropTypes.string,
   };
@@ -131,16 +137,15 @@ class SearchFilter extends Component {
             </Col>
           </Row>
           <Row>
-            <Col xs={4} md={2} className="no-padding-right">
-              <Form.Control as="select" size="sm">
-                <option selected disabled>Annotations</option>
-                <option>Life Stage</option>
-                <option>Sex</option>
-                <option>Plant Phenology</option>
-              </Form.Control>
-            </Col>
-            <Col xs={8} md={4}>
-                <Form.Control size="sm" type="text" placeholder="Annotation Value" onChange={this.props.handleAnnotationValueChange} value={this.props.annotationValue} />
+            <Col xs={12} md={6}>
+              <AnnotationsFilter
+                handleSelectedClick={this.props.handleSelectedClick}
+                handleAnnotationTermSelect={this.props.handleAnnotationTermSelect}
+                selectedAnnotations={this.props.selectedAnnotations}
+                excludedAnnotations={this.props.excludedAnnotations}
+                annotationsValue={this.props.annotationsValue}
+                annotationsMatch={this.props.annotationsMatch}
+              />
             </Col>
             <Col xs={12} md={6}>
                 <ObservationFieldFilter

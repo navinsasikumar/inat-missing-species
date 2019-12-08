@@ -12,7 +12,7 @@ import AutoComplete from '../AutoComplete';
 import SelectedFieldDisplay from './SelectedFieldDisplay';
 
 class ObservationFieldFilter extends Component {
-  static propTypes= {
+  static propTypes = {
     handleSelectedClick: PropTypes.func.isRequired,
     handleObsFieldTermChange: PropTypes.func.isRequired,
     handleObsFieldTermSelect: PropTypes.func.isRequired,
