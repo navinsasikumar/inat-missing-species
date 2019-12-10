@@ -37,6 +37,7 @@ class SearchDisplay extends Component {
     this.handleObsFieldValueChange = this.handleObsFieldValueChange.bind(this);
 
     this.handleAnnotationTermSelect = this.handleAnnotationTermSelect.bind(this);
+    this.handleAnnotationValueSelect = this.handleAnnotationValueSelect.bind(this);
 
     this.handleSelectedClick = this.handleSelectedClick.bind(this);
     this.handleCheckbox = this.handleCheckbox.bind(this);
@@ -76,6 +77,10 @@ class SearchDisplay extends Component {
       excludedAnnotations: [],
       annotationsInputValue: '',
       annotationsMatch: [],
+      selectedAnnotationValues: [],
+      excludedAnnotationValues: [],
+      annotationValuesInputValue: '',
+      annotationValuesMatch: [],
     };
   }
 
@@ -117,6 +122,24 @@ class SearchDisplay extends Component {
     const ids = idStr.split(',').map(id => Number(id));
     if (!annotations.results) return [];
     return annotations.results.filter(obj => ids.includes(obj.id));
+  }
+
+  makeAnnotationValuesObj = (annotations, idStr) => {
+    const ids = idStr.split(',').map(id => Number(id));
+    return annotations.filter(obj => ids.includes(obj.id));
+  }
+
+  makeFlattenedAnnotationValues = (annotations) => {
+    if (!annotations.results) return [];
+    const annotationValuesArr = [];
+    annotations.results
+      .forEach(obj => obj.values.forEach((val) => {
+        const newVal = { ...val };
+        newVal.termId = obj.id;
+        newVal.termLabel = obj.label;
+        annotationValuesArr.push(newVal);
+      }));
+    return annotationValuesArr;
   }
 
   splitQueryStr = async (queryStr) => {
@@ -176,16 +199,35 @@ class SearchDisplay extends Component {
       return obj;
     });
 
-    if (query.term_id) {
+    if (query.term_id
+      || query.without_term_id
+      || query.term_value_id
+      || query.without_term_value_id
+    ) {
       const getAnnotationsRes = await this.callApi('/api/annotations');
-      newState.selectedAnnotations = this.makeAnnotationObj(getAnnotationsRes, query.term_id);
-    }
-    if (query.without_term_id) {
-      const getAnnotationsRes = await this.callApi('/api/annotations');
-      newState.excludedAnnotations = this.makeAnnotationObj(
-        getAnnotationsRes,
-        query.without_term_id,
-      );
+      const flattenedAnnotationValues = this.makeFlattenedAnnotationValues(getAnnotationsRes);
+      if (query.term_id) {
+        newState.selectedAnnotations = this.makeAnnotationObj(getAnnotationsRes, query.term_id);
+      }
+      if (query.without_term_id) {
+        newState.excludedAnnotations = this.makeAnnotationObj(
+          getAnnotationsRes,
+          query.without_term_id,
+        );
+      }
+
+      if (query.term_value_id) {
+        newState.selectedAnnotationValues = this.makeAnnotationValuesObj(
+          flattenedAnnotationValues,
+          query.term_value_id,
+        );
+      }
+      if (query.without_term_value_id) {
+        newState.excludedAnnotationValues = this.makeAnnotationValuesObj(
+          flattenedAnnotationValues,
+          query.without_term_value_id,
+        );
+      }
     }
 
     if (query.page) {
@@ -390,9 +432,25 @@ class SearchDisplay extends Component {
       }));
     } else {
       this.setState(prevState => ({
-        excludedAnnotations: [...prevState.excludedUsers, selectedAnnotation],
+        excludedAnnotations: [...prevState.excludedAnnotations, selectedAnnotation],
         annotationsInputValue: '',
         annotationsMatch: [],
+      }));
+    }
+  }
+
+  handleAnnotationValueSelect(selectedAnnotationValue, exclude = false) {
+    if (exclude === false) {
+      this.setState(prevState => ({
+        selectedAnnotationValues: [...prevState.selectedAnnotationValues, selectedAnnotationValue],
+        annotationValuesInputValue: '',
+        annotationValuesMatch: [],
+      }));
+    } else {
+      this.setState(prevState => ({
+        excludedAnnotationValues: [...prevState.excludedAnnotationValues, selectedAnnotationValue],
+        annotationValuesInputValue: '',
+        annotationValuesMatch: [],
       }));
     }
   }
@@ -480,6 +538,18 @@ class SearchDisplay extends Component {
         this.setState({ excludedAnnotations });
         break;
       }
+      case 'annotationValues': {
+        const selectedAnnotationValues = [...this.state.selectedAnnotationValues];
+        selectedAnnotationValues.splice(index, 1);
+        this.setState({ selectedAnnotationValues });
+        break;
+      }
+      case 'annotationValuesExclude': {
+        const excludedAnnotationValues = [...this.state.excludedAnnotationValues];
+        excludedAnnotationValues.splice(index, 1);
+        this.setState({ excludedAnnotationValues });
+        break;
+      }
       default:
     }
   }
@@ -530,6 +600,16 @@ class SearchDisplay extends Component {
     const currExcludedAnnotationIds = this.state.excludedAnnotations
       .map(annotation => annotation.id);
 
+    const prevAnnotationValueIds = prevState.selectedAnnotationValues
+      .map(annotationValue => annotationValue.id);
+    const currAnnotationValueIds = this.state.selectedAnnotationValues
+      .map(annotationValue => annotationValue.id);
+
+    const prevExcludedAnnotationValueIds = prevState.excludedAnnotationValues
+      .map(annotationValue => annotationValue.id);
+    const currExcludedAnnotationValueIds = this.state.excludedAnnotationValues
+      .map(annotationValue => annotationValue.id);
+
     return !this.isEqualArrays(prevTaxonIds, currTaxonIds)
       || !this.isEqualArrays(prevExcludedTaxonIds, currExcludedTaxonIds)
       || !this.isEqualArrays(prevPlaceIds, currPlaceIds)
@@ -541,6 +621,8 @@ class SearchDisplay extends Component {
       || !this.isEqualArrays(prevObsFieldValueIds, currObsFieldValueIds)
       || !this.isEqualArrays(prevAnnotationIds, currAnnotationIds)
       || !this.isEqualArrays(prevExcludedAnnotationIds, currExcludedAnnotationIds)
+      || !this.isEqualArrays(prevAnnotationValueIds, currAnnotationValueIds)
+      || !this.isEqualArrays(prevExcludedAnnotationValueIds, currExcludedAnnotationValueIds)
       || JSON.stringify(prevState.checkboxes) !== JSON.stringify(this.state.checkboxes)
       || prevState.page !== this.state.page;
   }
@@ -603,6 +685,19 @@ class SearchDisplay extends Component {
 
     if (currAnnotationIds.length > 0) queryObj.term_id = currAnnotationIds.join(',');
     if (currExcludedAnnotationIds.length > 0) queryObj.without_term_id = currExcludedAnnotationIds.join(',');
+
+    return queryObj;
+  }
+
+  makeAnnotationValuesQuery = () => {
+    const queryObj = {};
+    const currAnnotationValueIds = this.state.selectedAnnotationValues
+      .map(annotationValue => annotationValue.id);
+    const currExcludedAnnotationValueIds = this.state.excludedAnnotationValues
+      .map(annotationValue => annotationValue.id);
+
+    if (currAnnotationValueIds.length > 0) queryObj.term_value_id = currAnnotationValueIds.join(',');
+    if (currExcludedAnnotationValueIds.length > 0) queryObj.without_term_value_id = currExcludedAnnotationValueIds.join(',');
 
     return queryObj;
   }
@@ -677,6 +772,7 @@ class SearchDisplay extends Component {
         ...this.makeCheckboxesQuery(),
         ...this.makeObsFieldQuery(),
         ...this.makeAnnotationsQuery(),
+        ...this.makeAnnotationValuesQuery(),
       };
 
       if (this.state.page !== 1) queryObj.page = this.state.page;
@@ -752,6 +848,10 @@ class SearchDisplay extends Component {
           selectedAnnotations={this.state.selectedAnnotations}
           excludedAnnotations={this.state.excludedAnnotations}
           annotationsMatch={this.state.annotationsMatch}
+          handleAnnotationValueSelect={this.handleAnnotationValueSelect}
+          selectedAnnotationValues={this.state.selectedAnnotationValues}
+          excludedAnnotationValues={this.state.excludedAnnotationValues}
+          annotationValuesMatch={this.state.annotationValuesMatch}
         />
         <SearchResults
           results={this.state.results}

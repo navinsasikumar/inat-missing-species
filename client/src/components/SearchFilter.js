@@ -73,8 +73,9 @@ class SearchFilter extends Component {
     annotationsMatch: PropTypes.array.isRequired,
     selectedAnnotations: PropTypes.array.isRequired,
     annotationsValue: PropTypes.string,
-    handleAnnotationValueChange: PropTypes.func.isRequired,
-    annotationValue: PropTypes.string,
+    excludedAnnotationValues: PropTypes.array.isRequired,
+    handleAnnotationValueSelect: PropTypes.func.isRequired,
+    selectedAnnotationValues: PropTypes.array.isRequired,
   };
 
   render() {
@@ -145,6 +146,10 @@ class SearchFilter extends Component {
                 excludedAnnotations={this.props.excludedAnnotations}
                 annotationsValue={this.props.annotationsValue}
                 annotationsMatch={this.props.annotationsMatch}
+                handleAnnotationValueSelect={this.props.handleAnnotationValueSelect}
+                selectedAnnotationValues={this.props.selectedAnnotationValues}
+                excludedAnnotationValues={this.props.excludedAnnotationValues}
+                annotationsValuesMatch={this.props.annotationsMatch}
               />
             </Col>
             <Col xs={12} md={6}>

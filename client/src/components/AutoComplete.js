@@ -99,6 +99,7 @@ class AutoComplete extends Component {
     handleIdentUsersSelect: PropTypes.func,
     handleObsFieldTermSelect: PropTypes.func,
     handleAnnotationTermSelect: PropTypes.func,
+    handleAnnotationValueSelect: PropTypes.func,
     noExclude: PropTypes.bool,
   };
 
@@ -336,6 +337,37 @@ class AutoComplete extends Component {
     </li>
   ));
 
+  handleAnnotationValueSelect = (annotationValue, exclude) => {
+    this.props.handleAnnotationValueSelect(annotationValue, exclude);
+  };
+
+  displayAnnotationValue = () => this.props.matches.map(annotation => (
+    <li key={`annotation-${annotation.id}`} data-id={annotation.id}>
+        <MatchItem>
+          <Row>
+            <Col xs={9} className="trimText">
+              <IncludeMatchItem
+                onClick={() => this.handleAnnotationValueSelect(annotation, false)}
+                onMouseDown={event => event.preventDefault()}
+              >
+                <Names>
+                  <CommonName>{annotation.label}</CommonName>
+                </Names>
+              </IncludeMatchItem>
+            </Col>
+            <Col xs={3} className="autocomplete-exclude-matches">
+              <ExcludeMatchItem
+                onClick={() => this.handleAnnotationValueSelect(annotation, true)}
+                onMouseDown={event => event.preventDefault()}
+              >
+                Exclude
+              </ExcludeMatchItem>
+            </Col>
+          </Row>
+        </MatchItem>
+    </li>
+  ));
+
 
   render() {
     let matchesList;
@@ -351,6 +383,8 @@ class AutoComplete extends Component {
       matchesList = this.displayObsFieldTerm();
     } else if (this.props.type === 'annotationTerm') {
       matchesList = this.displayAnnotationTerm();
+    } else if (this.props.type === 'annotationValue') {
+      matchesList = this.displayAnnotationValue();
     }
 
     return (

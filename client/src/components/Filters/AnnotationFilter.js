@@ -18,6 +18,7 @@ class AnnotationsFilter extends Component {
     this.state = {
       annotations: [],
       annotationFocus: false,
+      annotationValueFocus: false,
       annotationMatches: [],
     };
   }
@@ -26,10 +27,12 @@ class AnnotationsFilter extends Component {
     annotationTermValue: PropTypes.string,
     annotationValue: PropTypes.array,
     excludedAnnotations: PropTypes.array.isRequired,
+    excludedAnnotationValues: PropTypes.array.isRequired,
     handleAnnotationTermSelect: PropTypes.func.isRequired,
-    handleAnnotationValueChange: PropTypes.func,
+    handleAnnotationValueSelect: PropTypes.func,
     handleSelectedClick: PropTypes.func.isRequired,
     selectedAnnotations: PropTypes.array.isRequired,
+    selectedAnnotationValues: PropTypes.array.isRequired,
   };
 
   callApi = async () => {
@@ -57,9 +60,23 @@ class AnnotationsFilter extends Component {
     this.setState({ annotationFocus: false });
   };
 
+  handleAnnotationValueFocus = () => {
+    this.setState({ annotationValueFocus: true });
+  };
+
+  handleAnnotationValueBlur = () => {
+    this.setState({ annotationValueFocus: false });
+  };
+
   handleAnnotationTermSelect = (annotation, exclude) => {
+    // TODO Add termId and termLabel to annotationMatches
     this.setState({ annotationMatches: annotation.values, annotationFocus: false });
     this.props.handleAnnotationTermSelect(annotation, exclude);
+  }
+
+  handleAnnotationValueSelect = (annotation, exclude) => {
+    this.setState({ annotationValueFocus: false });
+    this.props.handleAnnotationValueSelect(annotation, exclude);
   }
 
   componentDidMount() {
@@ -69,9 +86,6 @@ class AnnotationsFilter extends Component {
   }
 
   render() {
-    const annotationValuesDropdown = this.state.annotationMatches.map(obj => (
-      <option key={`annotationValue-${obj.id}`} value={obj.id}>{obj.label}</option>
-    ));
     const selectedAnnotationTermLabel = this.props.selectedAnnotations.length > 0 ? 'Selected Annotations: ' : '';
     const excludedAnnotationTermLabel = this.props.excludedAnnotations.length > 0 ? 'Excluded Annotations: ' : '';
 
@@ -83,10 +97,8 @@ class AnnotationsFilter extends Component {
             {this.state.annotationFocus && <AutoComplete type="annotationTerm" matches={this.state.annotations} handleAnnotationTermSelect={this.handleAnnotationTermSelect}/>}
           </Col>
           <Col xs={6} md={6}>
-            <Form.Control as="select" size="sm" defaultValue={-1} onChange={this.props.handleAnnotationValueChange}>
-              <option disabled value={-1} key="annotationValue--1">Select Annotation Values</option>
-              {annotationValuesDropdown}
-            </Form.Control>
+            <Form.Control size="sm" type="text" placeholder="Annotation Value" onFocus={this.handleAnnotationValueFocus} onBlur={this.handleAnnotationValueBlur} value={this.props.annotationValue} />
+            {this.state.annotationValueFocus && <AutoComplete type="annotationValue" matches={this.state.annotationMatches} handleAnnotationValueSelect={this.handleAnnotationValueSelect}/>}
           </Col>
         </Row>
         <Row>
