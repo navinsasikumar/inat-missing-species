@@ -539,6 +539,7 @@ class SearchDisplay extends Component {
         break;
       }
       case 'annotationValues': {
+        // TODO Remove annotation terms as well
         const selectedAnnotationValues = [...this.state.selectedAnnotationValues];
         selectedAnnotationValues.splice(index, 1);
         this.setState({ selectedAnnotationValues });

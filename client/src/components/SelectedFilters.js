@@ -56,6 +56,13 @@ class SelectedFilters extends Component {
       }
     } else if (type === 'annotationTerms' || type === 'annotationTermsExclude') {
       selectedDisplay = this.props.selectedValue.label;
+    } else if (type === 'annotationValues' || type === 'annotationValuesExclude') {
+      const { selectedValue } = this.props;
+      if (selectedValue.termLabel) {
+        selectedDisplay = `${selectedValue.termLabel}: ${selectedValue.label}`;
+      } else {
+        selectedDisplay = selectedValue.label;
+      }
     }
 
     return (
