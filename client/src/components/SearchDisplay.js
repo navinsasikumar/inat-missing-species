@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import queryString from 'query-string';
 import SearchFilter from './SearchFilter';
 import SearchResults from './SearchResults';
+import LinksToiNat from './LinksToiNat';
 
 const SearchDisplayWrapper = styled.div``;
 
@@ -910,6 +911,7 @@ class SearchDisplay extends Component {
           excludedAnnotationValues={this.state.excludedAnnotationValues}
           annotationValuesMatch={this.state.annotationValuesMatch}
         />
+        <LinksToiNat queryStr={this.state.queryStr}/>
         <SearchResults
           results={this.state.results}
           loading={this.state.loading}
