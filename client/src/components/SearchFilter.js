@@ -139,20 +139,23 @@ class SearchFilter extends Component {
           </Row>
           <Row>
             <Col xs={12} md={6}>
-              <AnnotationsFilter
-                handleSelectedClick={this.props.handleSelectedClick}
-                handleAnnotationTermSelect={this.props.handleAnnotationTermSelect}
-                selectedAnnotations={this.props.selectedAnnotations}
-                excludedAnnotations={this.props.excludedAnnotations}
-                annotationsValue={this.props.annotationsValue}
-                annotationsMatch={this.props.annotationsMatch}
-                handleAnnotationValueSelect={this.props.handleAnnotationValueSelect}
-                selectedAnnotationValues={this.props.selectedAnnotationValues}
-                excludedAnnotationValues={this.props.excludedAnnotationValues}
-                annotationsValuesMatch={this.props.annotationsMatch}
-              />
+              <FormGroup>
+                <AnnotationsFilter
+                  handleSelectedClick={this.props.handleSelectedClick}
+                  handleAnnotationTermSelect={this.props.handleAnnotationTermSelect}
+                  selectedAnnotations={this.props.selectedAnnotations}
+                  excludedAnnotations={this.props.excludedAnnotations}
+                  annotationsValue={this.props.annotationsValue}
+                  annotationsMatch={this.props.annotationsMatch}
+                  handleAnnotationValueSelect={this.props.handleAnnotationValueSelect}
+                  selectedAnnotationValues={this.props.selectedAnnotationValues}
+                  excludedAnnotationValues={this.props.excludedAnnotationValues}
+                  annotationsValuesMatch={this.props.annotationsMatch}
+                />
+              </FormGroup>
             </Col>
             <Col xs={12} md={6}>
+              <FormGroup>
                 <ObservationFieldFilter
                   handleSelectedClick={this.props.handleSelectedClick}
                   handleObsFieldTermChange={this.props.handleObsFieldTermChange}
@@ -166,6 +169,7 @@ class SearchFilter extends Component {
                   handleSpeciesChange={this.props.handleSpeciesChange}
                   obsFieldValueMatch={this.props.obsFieldValueMatch}
                 />
+              </FormGroup>
             </Col>
           </Row>
           <Row>
