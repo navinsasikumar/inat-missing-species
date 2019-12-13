@@ -25,7 +25,7 @@ const SmallText = styled.div`
 
 class LinksToiNat extends Component {
   static propTypes = {
-    queryStr: PropTypes.func,
+    queryStr: PropTypes.string,
   };
 
   render() {

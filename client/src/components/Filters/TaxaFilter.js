@@ -38,7 +38,7 @@ class TaxaFilter extends Component {
           handleSelectedClick={this.props.handleSelectedClick}
           selectedArray={this.props.excludedSpecies}
           selectedLabel={excludedSpeciesLabel}
-          selectedType="spciesExclude"
+          selectedType="speciesExclude"
         />
       </div>
     );
