@@ -585,9 +585,26 @@ class SearchDisplay extends Component {
         break;
       }
       case 'annotationValuesExclude': {
-        const excludedAnnotationValues = [...this.state.excludedAnnotationValues];
-        excludedAnnotationValues.splice(index, 1);
-        this.setState({ excludedAnnotationValues });
+        if (value.termId) {
+          const excludedAnnotationValues = [...this.state.excludedAnnotationValues];
+          const excludedAnnotations = [...this.state.excludedAnnotations];
+
+          excludedAnnotationValues.splice(index, 1);
+
+          const matchedTerms = excludedAnnotationValues
+            .findIndex(elem => elem.termId === value.termId) >= 0;
+
+          if (!matchedTerms) {
+            const matchedIndex = excludedAnnotations.findIndex(elem => elem.id === value.termId);
+            excludedAnnotations.splice(matchedIndex, 1);
+          }
+          this.setState({ excludedAnnotationValues, excludedAnnotations });
+        } else {
+          const excludedAnnotations = [...this.state.excludedAnnotations];
+          const matchedIndex = excludedAnnotations.findIndex(elem => elem.id === value.id);
+          excludedAnnotations.splice(matchedIndex, 1);
+          this.setState({ excludedAnnotations });
+        }
         break;
       }
       default:
