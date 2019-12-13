@@ -341,13 +341,15 @@ class AutoComplete extends Component {
     this.props.handleAnnotationValueSelect(annotationValue, exclude);
   };
 
-  displayAnnotationValue = () => this.props.matches.map(annotation => (
-    <li key={`annotation-${annotation.id}`} data-id={annotation.id}>
+  displayAnnotationValue = () => this.props.matches.map((annotation) => {
+    const includeColLength = this.props.noExclude ? 12 : 9;
+    return (
+      <li key={`annotation-${annotation.id}`} data-id={annotation.id}>
         <MatchItem>
           <Row>
-            <Col xs={9} className="trimText">
+            <Col xs={includeColLength} className="trimText">
               <IncludeMatchItem
-                onClick={() => this.handleAnnotationValueSelect(annotation, false)}
+                onClick={() => this.handleAnnotationValueSelect(annotation, this.props.noExclude)}
                 onMouseDown={event => event.preventDefault()}
               >
                 <Names>
@@ -355,18 +357,19 @@ class AutoComplete extends Component {
                 </Names>
               </IncludeMatchItem>
             </Col>
-            <Col xs={3} className="autocomplete-exclude-matches">
+            {this.props.noExclude !== true && <Col xs={3} className="autocomplete-exclude-matches">
               <ExcludeMatchItem
                 onClick={() => this.handleAnnotationValueSelect(annotation, true)}
                 onMouseDown={event => event.preventDefault()}
               >
                 Exclude
               </ExcludeMatchItem>
-            </Col>
+            </Col>}
           </Row>
         </MatchItem>
-    </li>
-  ));
+      </li>
+    );
+  });
 
 
   render() {

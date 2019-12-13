@@ -425,17 +425,37 @@ class SearchDisplay extends Component {
 
   handleAnnotationTermSelect(selectedAnnotation, exclude = false) {
     if (exclude === false) {
-      this.setState(prevState => ({
-        selectedAnnotations: [...prevState.selectedAnnotations, selectedAnnotation],
-        annotationsInputValue: '',
-        annotationsMatch: [],
-      }));
+      this.setState((prevState) => {
+        if (prevState.selectedAnnotations
+          .findIndex(elem => elem.id === selectedAnnotation.id) < 0
+        ) {
+          return {
+            selectedAnnotations: [...prevState.selectedAnnotations, selectedAnnotation],
+            annotationsInputValue: '',
+            annotationsMatch: [],
+          };
+        }
+        return {
+          annotationsInputValue: '',
+          annotationsMatch: [],
+        };
+      });
     } else {
-      this.setState(prevState => ({
-        excludedAnnotations: [...prevState.excludedAnnotations, selectedAnnotation],
-        annotationsInputValue: '',
-        annotationsMatch: [],
-      }));
+      this.setState((prevState) => {
+        if (prevState.excludedAnnotations
+          .findIndex(elem => elem.id === selectedAnnotation.id) < 0
+        ) {
+          return {
+            excludedAnnotations: [...prevState.excludedAnnotations, selectedAnnotation],
+            annotationsInputValue: '',
+            annotationsMatch: [],
+          };
+        }
+        return {
+          annotationsInputValue: '',
+          annotationsMatch: [],
+        };
+      });
     }
   }
 
@@ -476,7 +496,7 @@ class SearchDisplay extends Component {
     }
   }
 
-  handleSelectedClick(index, type) {
+  handleSelectedClick(index, type, value) {
     switch (type) {
       case 'species': {
         const selectedSpecies = [...this.state.selectedSpecies];
@@ -539,10 +559,29 @@ class SearchDisplay extends Component {
         break;
       }
       case 'annotationValues': {
-        // TODO Remove annotation terms as well
-        const selectedAnnotationValues = [...this.state.selectedAnnotationValues];
-        selectedAnnotationValues.splice(index, 1);
-        this.setState({ selectedAnnotationValues });
+        if (value.termId) {
+          // This is a value - remove value and check if any other values with that termId exists
+          // If none do, remove the term as well
+          const selectedAnnotationValues = [...this.state.selectedAnnotationValues];
+          const selectedAnnotations = [...this.state.selectedAnnotations];
+
+          selectedAnnotationValues.splice(index, 1);
+
+          const matchedTerms = selectedAnnotationValues
+            .findIndex(elem => elem.termId === value.termId) >= 0;
+
+          if (!matchedTerms) {
+            const matchedIndex = selectedAnnotations.findIndex(elem => elem.id === value.termId);
+            selectedAnnotations.splice(matchedIndex, 1);
+          }
+          this.setState({ selectedAnnotationValues, selectedAnnotations });
+        } else {
+          // This is a term -  remove the term
+          const selectedAnnotations = [...this.state.selectedAnnotations];
+          const matchedIndex = selectedAnnotations.findIndex(elem => elem.id === value.id);
+          selectedAnnotations.splice(matchedIndex, 1);
+          this.setState({ selectedAnnotations });
+        }
         break;
       }
       case 'annotationValuesExclude': {
