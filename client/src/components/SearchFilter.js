@@ -20,10 +20,6 @@ import AnnotationsFilter from './Filters/AnnotationFilter';
 const SearchFilterWrapper = styled.div`
   padding: 10px;
   text-align: left;
-import styled from 'styled-components';
-import PropTypes from 'prop-types';
-import AutoComplete from './AutoComplete';
-import SelectedFilters from './SelectedFilters';
 `;
 
 const FormGroup = styled.div`
@@ -31,7 +27,18 @@ const FormGroup = styled.div`
   padding-bottom: 10px;
 `;
 
+const FilterToggle = styled.div`
+  cursor: pointer;
+`;
+
 class SearchFilter extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      showFilters: true,
+    };
+  }
+
   static propTypes= {
     handleSelectedClick: PropTypes.func.isRequired,
     excludedSpecies: PropTypes.array.isRequired,
@@ -78,6 +85,12 @@ class SearchFilter extends Component {
     selectedAnnotationValues: PropTypes.array.isRequired,
   };
 
+  toggleFilters = () => {
+    this.setState(prevState => ({
+      showFilters: !prevState.showFilters,
+    }));
+  }
+
   render() {
     return (
       <SearchFilterWrapper>
@@ -110,74 +123,85 @@ class SearchFilter extends Component {
               </FormGroup>
             </Col>
           </Row>
-          <Row>
-            <Col xs={12} md={6}>
-              <FormGroup>
-                <UsersFilter
-                  handleSelectedClick={this.props.handleSelectedClick}
-                  handleUsersChange={this.props.handleUsersChange}
-                  handleUsersSelect={this.props.handleUsersSelect}
-                  selectedUsers={this.props.selectedUsers}
-                  excludedUsers={this.props.excludedUsers}
-                  usersValue={this.props.usersValue}
-                  usersMatch={this.props.usersMatch}
-                />
-              </FormGroup>
+          {this.state.showFilters && <Row>
+            <Col>
+              <Row>
+                <Col xs={12} md={6}>
+                  <FormGroup>
+                    <UsersFilter
+                      handleSelectedClick={this.props.handleSelectedClick}
+                      handleUsersChange={this.props.handleUsersChange}
+                      handleUsersSelect={this.props.handleUsersSelect}
+                      selectedUsers={this.props.selectedUsers}
+                      excludedUsers={this.props.excludedUsers}
+                      usersValue={this.props.usersValue}
+                      usersMatch={this.props.usersMatch}
+                    />
+                  </FormGroup>
+                </Col>
+                <Col xs={12} md={6}>
+                  <FormGroup>
+                    <IdentUsersFilter
+                      handleSelectedClick={this.props.handleSelectedClick}
+                      handleIdentUsersChange={this.props.handleIdentUsersChange}
+                      handleIdentUsersSelect={this.props.handleIdentUsersSelect}
+                      selectedIdentUsers={this.props.selectedIdentUsers}
+                      identUsersValue={this.props.identUsersValue}
+                      identUsersMatch={this.props.identUsersMatch}
+                    />
+                  </FormGroup>
+                </Col>
+              </Row>
+              <Row>
+                <Col xs={12} md={6}>
+                  <FormGroup>
+                    <AnnotationsFilter
+                      handleSelectedClick={this.props.handleSelectedClick}
+                      handleAnnotationTermSelect={this.props.handleAnnotationTermSelect}
+                      selectedAnnotations={this.props.selectedAnnotations}
+                      excludedAnnotations={this.props.excludedAnnotations}
+                      annotationsValue={this.props.annotationsValue}
+                      annotationsMatch={this.props.annotationsMatch}
+                      handleAnnotationValueSelect={this.props.handleAnnotationValueSelect}
+                      selectedAnnotationValues={this.props.selectedAnnotationValues}
+                      excludedAnnotationValues={this.props.excludedAnnotationValues}
+                      annotationsValuesMatch={this.props.annotationsMatch}
+                    />
+                  </FormGroup>
+                </Col>
+                <Col xs={12} md={6}>
+                  <FormGroup>
+                    <ObservationFieldFilter
+                      handleSelectedClick={this.props.handleSelectedClick}
+                      handleObsFieldTermChange={this.props.handleObsFieldTermChange}
+                      handleObsFieldTermSelect={this.props.handleObsFieldTermSelect}
+                      selectedObsFieldTerm={this.props.selectedObsFieldTerm}
+                      obsFieldTermValue={this.props.obsFieldTermValue}
+                      obsFieldTermMatch={this.props.obsFieldTermMatch}
+                      currentlySelectedObsTerm={this.props.currentlySelectedObsTerm}
+                      handleObsFieldValueChange={this.props.handleObsFieldValueChange}
+                      obsFieldValue={this.props.obsFieldValue}
+                      handleSpeciesChange={this.props.handleSpeciesChange}
+                      obsFieldValueMatch={this.props.obsFieldValueMatch}
+                    />
+                  </FormGroup>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <CheckboxesFilter
+                    checkboxes={this.props.checkboxes}
+                    handleCheckbox={this.props.handleCheckbox}
+                  />
+                </Col>
+              </Row>
             </Col>
-            <Col xs={12} md={6}>
-              <FormGroup>
-                <IdentUsersFilter
-                  handleSelectedClick={this.props.handleSelectedClick}
-                  handleIdentUsersChange={this.props.handleIdentUsersChange}
-                  handleIdentUsersSelect={this.props.handleIdentUsersSelect}
-                  selectedIdentUsers={this.props.selectedIdentUsers}
-                  identUsersValue={this.props.identUsersValue}
-                  identUsersMatch={this.props.identUsersMatch}
-                />
-              </FormGroup>
-            </Col>
-          </Row>
-          <Row>
-            <Col xs={12} md={6}>
-              <FormGroup>
-                <AnnotationsFilter
-                  handleSelectedClick={this.props.handleSelectedClick}
-                  handleAnnotationTermSelect={this.props.handleAnnotationTermSelect}
-                  selectedAnnotations={this.props.selectedAnnotations}
-                  excludedAnnotations={this.props.excludedAnnotations}
-                  annotationsValue={this.props.annotationsValue}
-                  annotationsMatch={this.props.annotationsMatch}
-                  handleAnnotationValueSelect={this.props.handleAnnotationValueSelect}
-                  selectedAnnotationValues={this.props.selectedAnnotationValues}
-                  excludedAnnotationValues={this.props.excludedAnnotationValues}
-                  annotationsValuesMatch={this.props.annotationsMatch}
-                />
-              </FormGroup>
-            </Col>
-            <Col xs={12} md={6}>
-              <FormGroup>
-                <ObservationFieldFilter
-                  handleSelectedClick={this.props.handleSelectedClick}
-                  handleObsFieldTermChange={this.props.handleObsFieldTermChange}
-                  handleObsFieldTermSelect={this.props.handleObsFieldTermSelect}
-                  selectedObsFieldTerm={this.props.selectedObsFieldTerm}
-                  obsFieldTermValue={this.props.obsFieldTermValue}
-                  obsFieldTermMatch={this.props.obsFieldTermMatch}
-                  currentlySelectedObsTerm={this.props.currentlySelectedObsTerm}
-                  handleObsFieldValueChange={this.props.handleObsFieldValueChange}
-                  obsFieldValue={this.props.obsFieldValue}
-                  handleSpeciesChange={this.props.handleSpeciesChange}
-                  obsFieldValueMatch={this.props.obsFieldValueMatch}
-                />
-              </FormGroup>
-            </Col>
-          </Row>
+          </Row>}
           <Row>
             <Col>
-              <CheckboxesFilter
-                checkboxes={this.props.checkboxes}
-                handleCheckbox={this.props.handleCheckbox}
-              />
+              <FilterToggle onClick={this.toggleFilters}>
+                {this.state.showFilters ? 'Hide filters' : 'Show Filters'}
+              </FilterToggle>
             </Col>
           </Row>
         </Form>
