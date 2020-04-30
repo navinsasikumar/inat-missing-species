@@ -161,6 +161,7 @@ class TaxonImage extends Component {
 
 class TaxonText extends Component {
   render() {
+    const attribution = this.props.taxon.taxon.default_photo ? this.props.taxon.taxon.default_photo.attribution : 'none';
     return (
       <React.Fragment>
         <div className="taxon-text">
@@ -169,7 +170,7 @@ class TaxonText extends Component {
               {this.props.taxon.count} Observations
             </a>
             <div className="copyright-info">
-              <div data-effect="solid" data-delay-show='500' data-delay-hide='500' data-tip={'Photo: ' + this.props.taxon.taxon.default_photo.attribution}>CC</div>
+              <div data-effect="solid" data-delay-show='500' data-delay-hide='500' data-tip={'Photo: ' + attribution }>CC</div>
               <ReactTooltip />
             </div>
           </div>

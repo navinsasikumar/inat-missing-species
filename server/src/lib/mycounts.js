@@ -38,6 +38,11 @@ const getAOpts = (query) => {
   if (query.a_user_id) opts.user_id = query.a_user_id;
   if (query.a_months) opts.month = query.a_months;
   if (query.a_taxon_id) opts.taxon_id = query.a_taxon_id;
+  if (query.a_d1) opts.d1 = query.a_d1;
+  if (query.a_d2) opts.d2 = query.a_d2;
+  if (query.a_lrank) opts.lrank = query.a_lrank;
+  if (query.a_hrank) opts.hrank = query.a_hrank;
+  if (query.a_quality_grade) opts.quality_grade = query.a_quality_grade;
 
   return opts;
 }
@@ -84,6 +89,11 @@ const getBTotals = async function(query, page = 1) {
   if (query.b_months) opts.month = query.b_months;
   if (query.b_taxon_id) opts.taxon_id = query.b_taxon_id;
   if (!query.b_place_id && !query.b_project_id) return [];
+  if (query.b_d1) opts.d1 = query.b_d1;
+  if (query.b_d2) opts.d2 = query.b_d2;
+  if (query.b_lrank) opts.lrank = query.b_lrank;
+  if (query.b_hrank) opts.hrank = query.b_hrank;
+  if (query.b_quality_grade) opts.quality_grade = query.b_quality_grade;
 
   const response = await observations.speciesCounts(opts);
 
