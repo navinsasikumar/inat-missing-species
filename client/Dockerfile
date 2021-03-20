@@ -1,9 +1,10 @@
-FROM node:9.4.0
+FROM node:lts
 
 WORKDIR /usr/app
 
 COPY package*.json ./
 
+RUN npm rebuild node-sass --force
 RUN npm install -qy
 RUN ls node_modules
 
