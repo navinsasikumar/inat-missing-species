@@ -1,0 +1,15 @@
+Login to EC2
+Use alias cncec2
+(ssh -i ~/Projects/cnc.pem ubuntu@ec2-100-24-34-38.compute-1.amazonaws.com)
+
+Updating:
+cd ~/
+sudo ./snap-remove.sh
+cd cnc/inat-missing-species/
+sudo docker system prune
+sudo apt autoremove
+sudo apt -y autoclean
+git pull origin master
+sudo docker-compose -f docker-compose.prod.yml build
+sudo docker-compose down --remove-orphans
+sudo docker-compose -f docker-compose.prod.yml up -d
