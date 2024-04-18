@@ -1,13 +1,13 @@
 
 # Setup and build the client
 
-FROM node:lts-alpine as client
+FROM node:14-alpine as client
 
 WORKDIR /usr/app/client/
 COPY client/package*.json ./
 #RUN npm install -qy
 RUN apk --no-cache add --virtual native-deps \
-  g++ gcc libgcc libstdc++ linux-headers make python2 && \
+  g++ gcc libgcc libstdc++ linux-headers make python3 && \
   npm install --quiet node-gyp -g &&\
   npm install -qy && \
   apk del native-deps
@@ -17,7 +17,7 @@ RUN npm run build
 
 # Setup the server
 
-FROM node:lts-alpine
+FROM node:14-alpine
 
 WORKDIR /usr/app/
 COPY --from=client /usr/app/client/build/ ./client/build/
